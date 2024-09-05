@@ -1,19 +1,7 @@
-"""
-Computer Vision
-EEN020
-Project
-2023-12-11
-
-Extracts SIFT features
-
-Authors:
-        Maximilian Salén
-        Axel Qvarnström
-"""
-
 import cv2
 import numpy as np
 from auxiliary import cartesian_to_homogeneous
+
 
 def execute_sift_extraction(image_name1, image_name2):
     # Load images
@@ -47,5 +35,5 @@ def execute_sift_extraction(image_name1, image_name2):
 
     # Save descriptors
     desc_X1 = np.array([descriptors1[m.queryIdx] for m in good_matches]).T
-    
+
     return x1, x2, desc_X1

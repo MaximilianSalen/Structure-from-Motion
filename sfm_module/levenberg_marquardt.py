@@ -1,16 +1,3 @@
-"""
-Computer Vision
-EEN020
-Project
-2023-12-31
-
-Refine camera centers (or translation vectors) using Levenberg-Marquardt Method
-
-Authors:
-        Maximilian Salén
-        Axel Qvarnström
-"""
-
 import numpy as np
 
 
@@ -20,7 +7,7 @@ def levenberg_marquardt_optimize_T(K, R, X, x_norm, T_initial, num_iterations, m
     for _ in range(num_iterations):
         current_error = compute_reprojection_error(X, x_norm, K, R, T)
 
-        # Get the jacobian 
+        # Get the jacobian
         J_tot = np.array([]).reshape(0, 3)
         for j in range(X.shape[1]):
             # Get jacobian
@@ -35,17 +22,18 @@ def levenberg_marquardt_optimize_T(K, R, X, x_norm, T_initial, num_iterations, m
         new_error = compute_reprojection_error(X, x_norm, K, R, new_T)
         if np.sum(new_error**2) < np.sum(current_error**2):
             T = new_T
-    
-    return np.reshape(T, (3,1))
+
+    return np.reshape(T, (3, 1))
 
 
 def compute_reprojection_error(X, x_norm, K, R, T):
     x_projected = R @ X + T[:, np.newaxis]
 
-    x_projected /= x_projected[2] # Normalize to 2D
+    x_projected /= x_projected[2]  # Normalize to 2D
 
     errors = x_projected[:2, :] - x_norm[:2, :]
     return errors.flatten()
+
 
 # def levenberg_marquardt_optimize_T(K, R, X, x_norm, T_initial, num_iterations, mu):
 #     T = np.copy(T_initial)
@@ -66,7 +54,7 @@ def compute_reprojection_error(X, x_norm, K, R, T):
 
 #         delta_T = ComputeUpdate(error_tot, J_tot, mu)
 #         T += delta_T
-    
+
 #     return np.reshape(T, (3,1))
 
 # def compute_reprojection_error(X, x_norm, K, R, T):
@@ -88,7 +76,7 @@ def projection_derivatives_wrt_T(X, K, R, T):
     X_cam = R @ X + T
     x_proj = K @ X_cam
 
-    # Initialize Jacobian 
+    # Initialize Jacobian
     J = np.zeros((2, 3))
 
     # Iterate over T_i (T_x, T_y, T_z)
@@ -100,15 +88,17 @@ def projection_derivatives_wrt_T(X, K, R, T):
         dx_proj_dTi = K @ dX_cam_dTi
 
         # Chain rule (by using the quotient rule)
-        dx_z_inv_squared = 1 / (x_proj[2]**2)
-        dx1_norm_dTi = (x_proj[2] * dx_proj_dTi[0] - x_proj[0]* dx_proj_dTi[2]) * dx_z_inv_squared
-        dx2_norm_dTi = (x_proj[2] * dx_proj_dTi[1] - x_proj[1] * dx_proj_dTi[2]) * dx_z_inv_squared
+        dx_z_inv_squared = 1 / (x_proj[2] ** 2)
+        dx1_norm_dTi = (
+            x_proj[2] * dx_proj_dTi[0] - x_proj[0] * dx_proj_dTi[2]
+        ) * dx_z_inv_squared
+        dx2_norm_dTi = (
+            x_proj[2] * dx_proj_dTi[1] - x_proj[1] * dx_proj_dTi[2]
+        ) * dx_z_inv_squared
         J[0, i] = dx1_norm_dTi
         J[1, i] = dx2_norm_dTi
-    
+
     return J
-
-
 
 
 def cartesian_to_homogeneous(cartesian_points):
@@ -117,10 +107,3 @@ def cartesian_to_homogeneous(cartesian_points):
         (cartesian_points, np.ones((1, cartesian_points.shape[1])))
     )
     return homogeneous_points
-
-
-
-
-
-
-

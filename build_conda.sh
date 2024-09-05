@@ -1,11 +1,15 @@
 #!/bin/bash
 NAME="sfm_venv"
 
-# locate path of this script
+# Locate path of this script
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-conda create -n $NAME python=3.12 -y
-conda activate $NAME
+# Create the conda environment if it doesn't exist
+if ! conda info --envs | grep -q "$NAME"; then
+  conda create -n $NAME python=3.12 -y
+fi
 
-# Use conda run to install packages inside the environment
-conda run -n $NAME pip -r requirements.txt
+# Use conda run to install the required packages in the environment
+conda run -n $NAME pip install -r "$DIR/requirements.txt"
+
+echo "Conda environment $NAME is ready and the required packages are installed."

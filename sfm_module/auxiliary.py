@@ -1,16 +1,3 @@
-"""
-Computer Vision
-EEN020
-Project
-2023-12-31
-
-Auxliliary functionality
-
-Authors:
-        Maximilian Salén
-        Axel Qvarnström
-"""
-
 import os
 import pickle
 import cv2
@@ -19,12 +6,14 @@ import scipy
 from scipy.linalg import null_space
 import matplotlib.pyplot as plt
 
+
 def filter_3D_points(X):
     X_mean = np.mean(X, axis=0)
     distances = np.linalg.norm(X - X_mean, axis=1)
     quantile_90 = np.quantile(distances, 0.9)
     filtered_X = X[distances <= 5 * quantile_90]
     return filtered_X
+
 
 def plot_3d_points_and_cameras_new(X, P, ax, color):
     """
@@ -35,7 +24,6 @@ def plot_3d_points_and_cameras_new(X, P, ax, color):
     """
     # Convert homogeneous coordinates to 3D coordinates
     X_3d = pflat(X)
-
 
     # Plotting the 3D points
     ax.scatter(X_3d[0, :], X_3d[1, :], X_3d[2, :], s=1, color=color)
@@ -123,6 +111,7 @@ def pflat(X):
     """Normalize a matrix by dividing each column by its last element."""
     return X / X[-1, :]
 
+
 def cartesian_to_homogeneous(cartesian_points):
     # Add a row of ones at the bottom of the cartesian_points matrix
     homogeneous_points = np.vstack(
@@ -133,16 +122,16 @@ def cartesian_to_homogeneous(cartesian_points):
 
 # Function to save x_pairs using pickle
 def save_x_pairs(data, filename):
-    with open(filename, 'wb') as file:
+    with open(filename, "wb") as file:
         pickle.dump(data, file)
+
 
 # Function to load x_pairs if file exists
 def load_x_pairs(filename):
     if os.path.exists(filename):
-        with open(filename, 'rb') as file:
+        with open(filename, "rb") as file:
             return pickle.load(file)
     return None
-
 
 
 def draw_points(image_name, points):
@@ -158,7 +147,6 @@ def draw_points(image_name, points):
     # Display the image
     plt.imshow(image)
     plt.show()
-
 
 
 def project_points(Ps, X, imgs, xs):
@@ -192,6 +180,7 @@ def project_points(Ps, X, imgs, xs):
         plt.xlim([0, imgs[i].shape[1]])
         plt.ylim([imgs[i].shape[0], 0])
     plt.show()
+
 
 def homogeneous_to_cartesian(points: np.ndarray) -> np.ndarray:
     return points[:-1, :] / points[-1, :]

@@ -1,17 +1,5 @@
-"""
-Computer Vision
-EEN020
-Project
-2023-12-11
-
-Extract a (R|T) from a homography
-
-Authors:
-        Maximilian Salén
-        Axel Qvarnström
-"""
-
 import numpy as np
+
 
 def homography_to_RT(H, x1, x2):
     def unitize(a, b):
