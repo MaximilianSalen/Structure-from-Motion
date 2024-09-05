@@ -22,40 +22,40 @@ pip install -r requirements.txt
 
 # High-level Overview of Algorithm
 
-First, we calculate the relative orientations between consecutive images using a parallel RANSAC method that combines the estimation of the essential matrix ($E$) and homography ($H$). For non-planar scenes, the essential matrix is calculated using the 7/8-point method to account for depth and camera motion. In planar scenes, the homography is used to describe the transformation between views, as it is more suited for flat surfaces.
+1. First, we calculate the relative orientations between consecutive images using a parallel RANSAC method that combines the estimation of the essential matrix ($E$) and homography ($H$). For non-planar scenes, the essential matrix is calculated using the 7/8-point method to account for depth and camera motion. In planar scenes, the homography is used to describe the transformation between views, as it is more suited for flat surfaces.
 
-At each iteration of the RANSAC process, both $E$ and $H$ are estimated, and the model with the highest inlier count is selected. For homography-based estimations, rotation ($R$) and translation ($T$) are derived, and the corresponding essential matrices are computed. A cheirality check ensures that the calculated points are in front of both cameras. This iterative process continues until the optimal camera pose and scene structure are determined based on inlier thresholds for both $E$ and $H$.
+2. At each iteration of the RANSAC process, both $E$ and $H$ are estimated, and the model with the highest inlier count is selected. For homography-based estimations, rotation ($R$) and translation ($T$) are derived, and the corresponding essential matrices are computed. A cheirality check ensures that the calculated points are in front of both cameras. This iterative process continues until the optimal camera pose and scene structure are determined based on inlier thresholds for both $E$ and $H$.
 
-Upon obtaining the relative rotation vectors, we proceed to compute the absolute rotations. This is
+3. Upon obtaining the relative rotation vectors, we proceed to compute the absolute rotations. This is
 initiated by setting the first rotation vector as the Identity matrix. Subsequently, each successive absolute
 rotation is determined by computing the dot product of the preceding absolute rotation and the current
 relative rotation. These computed absolute rotations effectively describe the orientation of each camera
 in relation to the global coordinate system.
 
-Next, we begin by selecting an initial pair of images, which are typically not consecutive; for instance, we
+4. Next, we begin by selecting an initial pair of images, which are typically not consecutive; for instance, we
 might pair image 1 with image 4. With this initial pair, we aim to construct a preliminary 3D model.
 This involves calculating the relative rotation between the selected image pair by executing the RANSAC
 process. Utilizing the estimated rotation matrix ($R$), we then perform triangulation to derive the 3D
 points.
 
-Subsequently, these 3D points are repositioned to the world coordinate system. This is achieved by
+5. Subsequently, these 3D points are repositioned to the world coordinate system. This is achieved by
 taking the dot product of the 3D points with the transposed global rotation matrix of the first image in
 the initial pair. Additionally, we preserve the SIFT descriptors for one of the images in this initial pair,
 which aids in further processing and analysis.
 
-Thereafter, we robustly estimate the translation vector ($T$) for each image by employing a variation of
+6. Thereafter, we robustly estimate the translation vector ($T$) for each image by employing a variation of
 the RANSAC algorithm. This process involves iterating (approximately 100,000 times) and estimating
 $T$ using a two-point method. During each iteration, we calculate $T$ and evaluate the number of inliers
 it produces. The T that yields the highest number of inliers is ultimately selected as the most accurate
 estimate.
 
-Following the estimation of the translation vector ($T$) for each image (camera), we apply the Levenberg-
+7. Following the estimation of the translation vector ($T$) for each image (camera), we apply the Levenberg-
 Marquardt (LM) algorithm to refine each $T$. The LM algorithm focuses on minimizing the reprojection
 error. We calculate this error for each $T$, and if the squared sum of these errors is lower than the previously
 recorded lowest sum of all squared errors, then we update $T$ with this new value. This iterative refinement
 process aims to achieve the most accurate alignment and positioning of the camera in relation to the scene.
 
-In the final step, we construct the projection matrix ($P$) for each image by concatenating the absolute
+8. In the final step, we construct the projection matrix ($P$) for each image by concatenating the absolute
 rotation specific to that image with its refined translation vector ($T$), as obtained from the Levenberg-
 Marquardt (LM) algorithm. This assembled $P$ matrix is then utilized in the triangulation process for the
 reconstruction of 3D points. These reconstructed 3D points, generated from all the images (cameras),
