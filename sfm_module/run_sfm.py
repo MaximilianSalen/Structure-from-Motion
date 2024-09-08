@@ -1,7 +1,11 @@
+import argparse
 import matplotlib.pyplot as plt
 import time
 import auxiliary
 import numpy as np
+import yaml
+import os
+
 from get_dataset_info import get_dataset_info
 from ransac_algorithm import run_ransac
 from extract_sift import execute_sift_extraction
@@ -10,15 +14,40 @@ from estimate_T import get_T, get_correspondences
 from levenberg_marquardt import levenberg_marquardt_optimize_T
 
 
+def get_data(path_to_cfg: str):
+    cfg_path = os.path.join(path_to_cfg, "cfg.yml")
+    if os.path.isfile(cfg_path):
+        with open(cfg_path, "r") as file:
+            cfg_file = yaml.safe_load(file)
+            focal_length = cfg_file["camera"]["focal_length"]
+            principal_point = cfg_file["camera"]["principal_point"]
+            img_paths = [path for path in cfg_file["image_file_paths"]]
+            init_pair = cfg_file["initial_pair"]
+        K = [
+            [focal_length[0], 0, principal_point[0]],
+            [0, focal_length[1], principal_point[1]],
+            [0, 0, 1],
+        ]
+    else:
+        raise OSError("File not found")
+
+    return K, img_paths, init_pair
+
+
 def run_sfm():
-    print("Enter a dataset (1-11):")
-    dataset_nr = int(input())
-    data_root = "/home/simsom/work_space/repos/Structure-from-motion/sfm_module/"
-    K, img_names, init_pair, pixel_threshold = get_dataset_info(data_root, dataset_nr)
+    # Take arguments from command line
+    parser = argparse.ArgumentParser()
+    parser.add_argument("data_path", type=str)
+    parser.add_argument("dataset", type=str)
+    parser.add_argument("threshold", type=float)
+    args = parser.parse_args()
+    dataset_path = os.path.join(args.data_path, args.dataset)
+    K, img_names, init_pair = get_data(dataset_path)
+    pixel_threshold = args.threshold
     nr_images = len(img_names)
 
     # File name for saving/loading x_pairs
-    x_pairs_filename = f"x_pairs_dataset_{dataset_nr}.pkl"
+    x_pairs_filename = f"x_pairs_dataset_{args.dataset}.pkl"
 
     # Check if x_pairs already exist
     x_pairs = auxiliary.load_x_pairs(x_pairs_filename)
