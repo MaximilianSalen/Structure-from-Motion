@@ -1,0 +1,18 @@
+{
+  "image_file_paths": [
+            "data/9/DSCN5184.JPG",
+            "data/9/DSCN5185.JPG",
+            "data/9/DSCN5186.JPG",
+            "data/9/DSCN5187.JPG",
+            "data/9/DSCN5188.JPG",
+            "data/9/DSCN5189.JPG",
+            "data/9/DSCN5191.JPG",
+            "data/9/DSCN5192.JPG",
+            "data/9/DSCN5193.JPG",
+        ],
+  "camera": 
+    {focal_length: [2489.14, 2489.14],
+    principal_point: [2466.74, 2466.74]
+  },
+  "initial_pair": [3, 5]
+}

@@ -1,0 +1,8 @@
+{
+  "image_file_paths": ["data/1/kronan1.JPG", "data/1/kronan2.JPG"],
+  "camera": 
+    {focal_length: [2489.14, 2489.14],
+    principal_point: [968, 648]
+  },
+  "initial_pair": [0, 1]
+}

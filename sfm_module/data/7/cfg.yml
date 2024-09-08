@@ -1,0 +1,16 @@
+{
+  "image_file_paths": [
+            "data/7/DSCN7409.JPG",
+            "data/7/DSCN7410.JPG",
+            "data/7/DSCN7411.JPG",
+            "data/7/DSCN7412.JPG",
+            "data/7/DSCN7413.JPG",
+            "data/7/DSCN7414.JPG",
+            "data/7/DSCN7415.JPG",
+        ],
+  "camera": 
+    {focal_length: [2489.14, 2489.14],
+    principal_point: [2466.74, 2466.74]
+  },
+  "initial_pair": [0, 6]
+}

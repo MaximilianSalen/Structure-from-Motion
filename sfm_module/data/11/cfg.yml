@@ -1,0 +1,18 @@
+{
+  "image_file_paths": [
+            "data/11/0000.jpg",
+            "data/11/0001.jpg",
+            "data/11/0003.jpg",
+            "data/11/0004.jpg",
+            "data/11/0005.jpg",
+            "data/11/0006.jpg",
+            "data/11/0007.jpg",
+            "data/11/0008.jpg",
+            "data/11/0009.jpg",
+        ],
+  "camera": 
+    {focal_length: [2759.48, 2764.16],
+    principal_point: [1520.69, 1006.81]
+  },
+  "initial_pair": [1, 3]
+}

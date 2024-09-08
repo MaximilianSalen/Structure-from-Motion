@@ -1,0 +1,23 @@
+{
+  "image_file_paths": [
+            "data/4/DSC_0480.JPG",
+            "data/4/DSC_0481.JPG",
+            "data/4/DSC_0482.JPG",
+            "data/4/DSC_0483.JPG",
+            "data/4/DSC_0484.JPG",
+            "data/4/DSC_0485.JPG",
+            "data/4/DSC_0486.JPG",
+            "data/4/DSC_0487.JPG",
+            "data/4/DSC_0488.JPG",
+            "data/4/DSC_0489.JPG",
+            "data/4/DSC_0490.JPG",
+            "data/4/DSC_0491.JPG",
+            "data/4/DSC_0492.JPG",
+            "data/4/DSC_0493.JPG",
+        ],
+  "camera": 
+    {focal_length: [2378.51, 2378.51],
+    principal_point: [968, 648]
+  },
+  "initial_pair": [4, 9]
+}

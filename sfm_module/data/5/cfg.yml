@@ -1,0 +1,19 @@
+{
+  "image_file_paths": [
+            "data/5/DSC_0336.JPG",
+            "data/5/DSC_0337.JPG",
+            "data/5/DSC_0338.JPG",
+            "data/5/DSC_0339.JPG",
+            "data/5/DSC_0340.JPG",
+            "data/5/DSC_0341.JPG",
+            "data/5/DSC_0342.JPG",
+            "data/5/DSC_0343.JPG",
+            "data/5/DSC_0344.JPG",
+            "data/5/DSC_0345.JPG",
+        ],
+  "camera": 
+    {focal_length: [2489.14, 2489.14],
+    principal_point: [968, 648]
+  },
+  "initial_pair": [4, 6]
+}

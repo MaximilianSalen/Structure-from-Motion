@@ -10,8 +10,7 @@ from estimate_T import get_T, get_correspondences
 from levenberg_marquardt import levenberg_marquardt_optimize_T
 
 
-def test():
-
+def run_sfm():
     print("Enter a dataset (1-11):")
     dataset_nr = int(input())
     data_root = "/home/simsom/work_space/repos/Structure-from-motion/sfm_module/"
@@ -230,4 +229,4 @@ def test():
     print("Test completed")
 
 
-test()
+run_sfm()
