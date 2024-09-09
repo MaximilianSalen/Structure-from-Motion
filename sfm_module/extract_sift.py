@@ -3,7 +3,7 @@ import numpy as np
 import logging
 from tqdm import tqdm
 import time
-from auxiliary import *
+from utils import *
 
 
 def process_sift_for_image_pairs(img_paths, init_pair, dataset):

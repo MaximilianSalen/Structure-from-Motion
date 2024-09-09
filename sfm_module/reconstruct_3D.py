@@ -1,30 +1,41 @@
-import numpy as np
-import cv2
-from ransac_algorithm import run_ransac
-from auxiliary import triangulate_3D_point_DLT
-from auxiliary import cartesian_to_homogeneous
 import time
+import logging
+import numpy as np
+from ransac_algorithm import run_ransac
+from utils import triangulate_3D_point_DLT, log_execution_time
 
 
+@log_execution_time
 def run_reconstruction(
     relative_rotations, init_x1, init_x2, K, first_init_image_idx, pixel_threshold
 ):
-    start_time = time.time()
-    absolute_rotations = compute_absolute_rotations(relative_rotations)
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed Time Compute Absolute rotations: {elapsed_time} seconds")
+    """
+    Runs the 3D reconstruction process, computing absolute rotations and
+    reconstructing initial 3D points from the input data.
 
-    start_time = time.time()
+    Args:
+        relative_rotations (list): List of relative rotations between image pairs.
+        init_x1 (np.ndarray): Keypoints from the first initial image.
+        init_x2 (np.ndarray): Keypoints from the second initial image.
+        K (np.ndarray): Camera intrinsic matrix.
+        first_init_image_idx (int): Index of the first image in the initial pair.
+        pixel_threshold (float): Threshold for pixel error in 3D point reconstruction.
+
+    Returns:
+        tuple: Contains the reconstructed 3D points (X0), absolute rotations, and inliers.
+    """
+    absolute_rotations = compute_absolute_rotations(relative_rotations)
+
     X0, inliers = reconstruct_initial_3D_points(
         init_x1, init_x2, K, absolute_rotations[first_init_image_idx], pixel_threshold
     )
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed Time Compute Reconstruct 3D points: {elapsed_time} seconds")
+    logging.info(
+        f"Number of inliers for reconstruction of initial pair: {len(inliers)}"
+    )
     return X0, absolute_rotations, inliers
 
 
+@log_execution_time
 def compute_absolute_rotations(relative_rotations: list):
     """
     Compute absolute rotations for each camera given relative rotations.
@@ -44,6 +55,7 @@ def compute_absolute_rotations(relative_rotations: list):
     return absolute_rotations
 
 
+@log_execution_time
 def reconstruct_initial_3D_points(x1, x2, K, R_i1, pixel_threshold):
     R, T, inliers = run_ransac(K, x1, x2, pixel_threshold)
 

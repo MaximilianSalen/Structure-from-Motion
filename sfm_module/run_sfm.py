@@ -2,7 +2,7 @@ import argparse
 import matplotlib.pyplot as plt
 import time
 import logging
-import auxiliary
+from utils import *
 import numpy as np
 import yaml
 import os
@@ -17,6 +17,7 @@ from levenberg_marquardt import levenberg_marquardt_optimize_T
 logging.basicConfig(level=logging.INFO)
 
 
+@log_execution_time
 def get_data(path_to_cfg: str):
     """
     Loads camera parameters and image data from a configuration file.
@@ -162,9 +163,9 @@ def run_sfm():
         P2 = K @ P2
         x1 = x_pairs[2 * i_camera]
         x2 = x_pairs[2 * i_camera + 1]
-        X_triangulated = auxiliary.triangulate_3D_point_DLT([P1, P2], [x1, x2])
-        X_filtered = auxiliary.filter_3D_points(X_triangulated)
-        auxiliary.plot_3d_points_and_cameras(X_filtered, [P1, P2])
+        X_triangulated = triangulate_3D_point_DLT([P1, P2], [x1, x2])
+        X_filtered = filter_3D_points(X_triangulated)
+        plot_3d_points_and_cameras(X_filtered, [P1, P2])
 
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection="3d")
@@ -212,11 +213,9 @@ def run_sfm():
         P2 = K @ P2
         x1 = x_pairs[2 * i_camera]
         x2 = x_pairs[2 * i_camera + 1]
-        X_triangulated = auxiliary.triangulate_3D_point_DLT([P1, P2], [x1, x2])
-        X_filtered = auxiliary.filter_3D_points(X_triangulated)
-        auxiliary.plot_3d_points_and_cameras_new(
-            X_filtered, [P1, P2], ax, colors[i_camera]
-        )
+        X_triangulated = triangulate_3D_point_DLT([P1, P2], [x1, x2])
+        X_filtered = filter_3D_points(X_triangulated)
+        plot_3d_points_and_cameras_new(X_filtered, [P1, P2], ax, colors[i_camera])
     plt.show()
 
     print("Test completed")

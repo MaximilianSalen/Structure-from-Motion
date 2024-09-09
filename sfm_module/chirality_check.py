@@ -1,5 +1,5 @@
 import numpy as np
-from auxiliary import triangulate_3D_point_DLT
+from utils import triangulate_3D_point_DLT
 
 
 def perform_chirality_check(P2s, K, x1, x2):

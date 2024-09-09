@@ -1,10 +1,27 @@
 import os
 import pickle
+import time
+import logging
 import cv2
 import numpy as np
 import scipy
 from scipy.linalg import null_space
 import matplotlib.pyplot as plt
+
+
+def log_execution_time(func):
+    """
+    A decorator to log the execution time of a function.
+    """
+
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        elapsed_time = time.time() - start_time
+        logging.info(f"Elapsed Time for {func.__name__}: {elapsed_time:.2f} seconds")
+        return result
+
+    return wrapper
 
 
 def filter_3D_points(X):
@@ -188,6 +205,6 @@ def homogeneous_to_cartesian(points: np.ndarray) -> np.ndarray:
     return points[:-1, :] / points[-1, :]
 
 
-def load_data(file_path_data: str) -> (np.ndarray, dict):
+def load_data(file_path_data: str):
     data = scipy.io.loadmat(file_path_data, squeeze_me=True)
     return data
