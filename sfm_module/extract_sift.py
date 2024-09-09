@@ -35,9 +35,7 @@ def process_sift_for_image_pairs(img_paths, init_pair, dataset):
         # Process consecutive image pairs
         for i in tqdm(range(nr_images - 1), desc="Extracting SIFT pairs"):
             start_time = time.time()
-            x1, x2, _ = compute_sift_keypoints_and_matches(
-                img_paths[i], img_paths[i + 1]
-            )
+            x1, x2, _ = compute_sift_keypoints(img_paths[i], img_paths[i + 1])
             elapsed_time = time.time() - start_time
             logging.info(
                 f"SIFT extraction completed for pair {i}-{i+1} in {elapsed_time:.2f} seconds"
@@ -55,9 +53,7 @@ def process_sift_for_image_pairs(img_paths, init_pair, dataset):
     if initial_pair is None:
         start_time = time.time()
         init_imgs = [img_paths[i] for i in init_pair]
-        init_x1, init_x2, desc_X = compute_sift_keypoints_and_matches(
-            init_imgs[0], init_imgs[1]
-        )
+        init_x1, init_x2, desc_X = compute_sift_keypoints(init_imgs[0], init_imgs[1])
         elapsed_time = time.time() - start_time
 
         logging.info(f"Initial SIFT extraction completed in {elapsed_time:.2f} seconds")
@@ -72,7 +68,7 @@ def process_sift_for_image_pairs(img_paths, init_pair, dataset):
     return x_pairs, initial_pair
 
 
-def compute_sift_keypoints_and_matches(image_path1: str, image_path2: str):
+def compute_sift_keypoints(image_path1: str, image_path2: str):
     """
     Extracts and matches SIFT keypoints between two images.
 

@@ -82,21 +82,8 @@ def run_sfm():
         dataset=args.dataset,
     )
 
-    RT_list = []
-    R_list = []
-    T_list = []
-    for i in range(len(x_pairs) // 2):
-        start_time = time.time()
-        x1 = x_pairs[2 * i]
-        x2 = x_pairs[2 * i + 1]
-        i_R, i_T, _ = run_ransac(K, x1, x2, pixel_threshold)
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print(f"Elapsed Time Run RANSAC: {elapsed_time} seconds")
-        i_RT = [i_R, i_T]
-        RT_list = RT_list + i_RT
-        R_list = R_list + [i_R]
-        T_list = T_list + [i_T]
+    # Run RANSAC algorithm
+    RT_list, R_list, T_list = run_ransac(K, x_pairs, pixel_threshold)
 
     # # Plot Testing code
     # for i_camera in range(nr_images-1):
