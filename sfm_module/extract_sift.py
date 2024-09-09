@@ -27,8 +27,10 @@ def process_sift_for_image_pairs(img_paths, init_pair, dataset):
     x_pairs_filename = f"x_pairs_dataset_{dataset}.pkl"
     init_pair_filename = f"init_pair_dataset_{dataset}.pkl"
 
+    save_location = os.path.dirname(img_paths[0])
+
     # Attempt to load x_pairs data
-    x_pairs = load_x_pairs(x_pairs_filename)
+    x_pairs = load_x_pairs(x_pairs_filename, save_location)
     if x_pairs is None:
         x_pairs = []
         nr_images = len(img_paths)
@@ -43,13 +45,17 @@ def process_sift_for_image_pairs(img_paths, init_pair, dataset):
             x_pairs.extend([x1, x2])
 
         # Save the extracted SIFT pairs
-        save_x_pairs(x_pairs, x_pairs_filename)
-        logging.info(f"x_pairs saved to {x_pairs_filename}")
+        save_x_pairs(x_pairs, x_pairs_filename, save_location)
+        logging.info(
+            f"x_pairs saved to {os.path.join(save_location, x_pairs_filename)}"
+        )
     else:
-        logging.info(f"x_pairs loaded from {x_pairs_filename}")
+        logging.info(
+            f"x_pairs loaded from {os.path.join(save_location, x_pairs_filename)}"
+        )
 
     # Attempt to load the initial pair data
-    initial_pair = load_x_pairs(init_pair_filename)
+    initial_pair = load_x_pairs(init_pair_filename, save_location)
     if initial_pair is None:
         start_time = time.time()
         init_imgs = [img_paths[i] for i in init_pair]
@@ -60,10 +66,14 @@ def process_sift_for_image_pairs(img_paths, init_pair, dataset):
         initial_pair = [init_x1, init_x2, desc_X]
 
         # Save the extracted initial pair
-        save_x_pairs(initial_pair, init_pair_filename)
-        logging.info(f"Initial pair saved to {init_pair_filename}")
+        save_x_pairs(initial_pair, init_pair_filename, save_location)
+        logging.info(
+            f"Initial pair saved to {os.path.join(save_location, init_pair_filename)}"
+        )
     else:
-        logging.info(f"Initial pair loaded from {init_pair_filename}")
+        logging.info(
+            f"Initial pair loaded from {os.path.join(save_location, init_pair_filename)}"
+        )
 
     return x_pairs, initial_pair
 

@@ -121,15 +121,17 @@ def cartesian_to_homogeneous(cartesian_points):
 
 
 # Function to save x_pairs using pickle
-def save_x_pairs(data, filename):
-    with open(filename, "wb") as file:
+def save_x_pairs(data, filename, save_location):
+    file_path = os.path.join(save_location, filename)
+    with open(file_path, "wb") as file:
         pickle.dump(data, file)
 
 
 # Function to load x_pairs if file exists
-def load_x_pairs(filename):
-    if os.path.exists(filename):
-        with open(filename, "rb") as file:
+def load_x_pairs(filename, save_location):
+    file_path = os.path.join(save_location, filename)
+    if os.path.exists(file_path):
+        with open(file_path, "rb") as file:
             return pickle.load(file)
     return None
 
