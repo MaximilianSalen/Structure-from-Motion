@@ -1,17 +1,20 @@
 import argparse
 import matplotlib.pyplot as plt
 import time
+import logging
 import auxiliary
 import numpy as np
 import yaml
 import os
-
-from get_dataset_info import get_dataset_info
+from tqdm import tqdm
 from ransac_algorithm import run_ransac
-from extract_sift import execute_sift_extraction
+from extract_sift import extract_sift_data
 from reconstruct_3D import run_reconstruction
 from estimate_T import get_T, get_correspondences
 from levenberg_marquardt import levenberg_marquardt_optimize_T
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
 
 
 def get_data(path_to_cfg: str):
@@ -35,57 +38,28 @@ def get_data(path_to_cfg: str):
 
 
 def run_sfm():
-    # Take arguments from command line
-    parser = argparse.ArgumentParser()
-    parser.add_argument("data_path", type=str)
-    parser.add_argument("dataset", type=str)
-    parser.add_argument("threshold", type=float)
+    """Main function to run the structure from motion pipeline."""
+
+    # Parse arguments
+    parser = argparse.ArgumentParser(description="Run Structure-from-Motion pipeline.")
+    parser.add_argument("data_path", type=str, help="Base path to the dataset")
+    parser.add_argument("dataset", type=str, help="Name of the dataset")
+    parser.add_argument("threshold", type=float, help="Pixel threshold for matching")
     args = parser.parse_args()
     dataset_path = os.path.join(args.data_path, args.dataset)
+    logging.info(f"Dataset path: {dataset_path}")
+
+    # Load necessary data
     K, img_names, init_pair = get_data(dataset_path)
     pixel_threshold = args.threshold
     nr_images = len(img_names)
 
-    # File name for saving/loading x_pairs
-    x_pairs_filename = f"x_pairs_dataset_{args.dataset}.pkl"
-
-    # Check if x_pairs already exist
-    x_pairs = auxiliary.load_x_pairs(x_pairs_filename)
-
-    if x_pairs is None:
-        x_pairs = []
-        for i in range(nr_images - 1):
-            start_time = time.time()
-            x1, x2, _ = execute_sift_extraction(img_names[i], img_names[i + 1])
-            end_time = time.time()
-            elapsed_time = end_time - start_time
-            print(f"Elapsed Time Sift extraction: {elapsed_time} seconds")
-            x_pairs = x_pairs + [x1, x2]
-
-        # Save the extracted x_pairs
-        auxiliary.save_x_pairs(x_pairs, x_pairs_filename)
-    else:
-        print("x_pairs data already exists. Loaded from file.")
-
-    ### Initial Pair ###
-    init_pair_filename = f"init_pair_dataset_{dataset_nr}.pkl"
-    initial_pair = auxiliary.load_x_pairs(init_pair_filename)
-
-    if initial_pair is None:
-        start_time = time.time()
-
-        init_imgs = [img_names[i] for i in init_pair]
-        init_x1, init_x2, desc_X = execute_sift_extraction(init_imgs[0], init_imgs[1])
-
-        end_time = time.time()
-        elapsed_time = end_time - start_time
-        print(f"Elapsed Time Sift extraction: {elapsed_time} seconds")
-        initial_pair = [init_x1, init_x2, desc_X]
-
-        # Save the extracted initial pair
-        auxiliary.save_x_pairs(initial_pair, init_pair_filename)
-    else:
-        print("initial_pairs data already exists. Loaded from file.")
+    # Call the extract_sift_data function
+    x_pairs, initial_pair = extract_sift_data(
+        img_names=img_names,
+        init_pair=init_pair,
+        dataset=args.dataset,
+    )
 
     # i_R, i_T, inss = run_ransac(K, initial_pair[0], initial_pair[1], pixel_threshold)
 
