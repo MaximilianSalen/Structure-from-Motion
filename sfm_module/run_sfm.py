@@ -8,7 +8,7 @@ import yaml
 import os
 from tqdm import tqdm
 from ransac_algorithm import run_ransac
-from extract_sift import extract_sift_data
+from extract_sift import process_sift_for_image_pairs
 from reconstruct_3D import run_reconstruction
 from estimate_T import get_T, get_correspondences
 from levenberg_marquardt import levenberg_marquardt_optimize_T
@@ -18,23 +18,43 @@ logging.basicConfig(level=logging.INFO)
 
 
 def get_data(path_to_cfg: str):
+    """
+    Loads camera parameters and image data from a configuration file.
+
+    Args:
+        path_to_cfg (str): Directory path to the 'cfg.yml' file.
+
+    Returns:
+        tuple: A tuple containing:
+            - K (list): 3x3 intrinsic camera matrix.
+            - img_names (list): List of image file names.
+            - init_pair (list): Indices for initial image pair from config.
+
+    Raises:
+        OSError: If 'cfg.yml' is not found.
+    """
+
     cfg_path = os.path.join(path_to_cfg, "cfg.yml")
-    if os.path.isfile(cfg_path):
-        with open(cfg_path, "r") as file:
-            cfg_file = yaml.safe_load(file)
-            focal_length = cfg_file["camera"]["focal_length"]
-            principal_point = cfg_file["camera"]["principal_point"]
-            img_paths = [path for path in cfg_file["image_file_paths"]]
-            init_pair = cfg_file["initial_pair"]
-        K = [
-            [focal_length[0], 0, principal_point[0]],
-            [0, focal_length[1], principal_point[1]],
-            [0, 0, 1],
-        ]
-    else:
+
+    if not os.path.isfile(cfg_path):
         raise OSError("File not found")
 
-    return K, img_paths, init_pair
+    with open(cfg_path, "r") as file:
+        cfg_file = yaml.safe_load(file)
+
+        focal_length = cfg_file["camera"]["focal_length"]
+        principal_point = cfg_file["camera"]["principal_point"]
+        img_names = cfg_file["image_file_names"]
+        init_pair = cfg_file["initial_pair"]
+
+    # Constructing the intrinsic camera matrix
+    K = [
+        [focal_length[0], 0, principal_point[0]],
+        [0, focal_length[1], principal_point[1]],
+        [0, 0, 1],
+    ]
+
+    return K, img_names, init_pair
 
 
 def run_sfm():
@@ -53,15 +73,14 @@ def run_sfm():
     K, img_names, init_pair = get_data(dataset_path)
     pixel_threshold = args.threshold
     nr_images = len(img_names)
+    img_paths = [os.path.join(dataset_path, img_name) for img_name in img_names]
 
     # Call the extract_sift_data function
-    x_pairs, initial_pair = extract_sift_data(
-        img_names=img_names,
+    x_pairs, initial_pair = process_sift_for_image_pairs(
+        img_paths=img_paths,
         init_pair=init_pair,
         dataset=args.dataset,
     )
-
-    # i_R, i_T, inss = run_ransac(K, initial_pair[0], initial_pair[1], pixel_threshold)
 
     RT_list = []
     R_list = []
@@ -232,4 +251,5 @@ def run_sfm():
     print("Test completed")
 
 
-run_sfm()
+if __name__ == "__main__":
+    run_sfm()

@@ -1,21 +1,21 @@
 {
-  "image_file_paths": [
-            "data/10/0000.png",
-            "data/10/0001.png",
-            "data/10/0002.png",
-            "data/10/0003.png",
-            "data/10/0004.png",
-            "data/10/0005.png",
-            "data/10/0006.png",
-            "data/10/0007.png",
-            "data/10/0008.png",
-            "data/10/0009.png",
-            "data/10/0009.png",
-            "data/10/0010.png",
-        ],
-  "camera": 
-    {focal_length: [689.87, 691.04],
-    principal_point: [380.17, 251.70]
+  "image_file_names": [
+    "0000.png",
+    "0001.png",
+    "0002.png",
+    "0003.png",
+    "0004.png",
+    "0005.png",
+    "0006.png",
+    "0007.png",
+    "0008.png",
+    "0009.png",
+    "0009.png",
+    "0010.png"
+  ],
+  "camera": {
+    "focal_length": [689.87, 691.04],
+    "principal_point": [380.17, 251.70]
   },
   "initial_pair": [4, 6]
 }

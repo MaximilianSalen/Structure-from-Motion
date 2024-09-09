@@ -1,17 +1,17 @@
 {
-  "image_file_paths": [
-            "data/6/DSCN2115.JPG",
-            "data/6/DSCN2116.JPG",
-            "data/6/DSCN2117.JPG",
-            "data/6/DSCN2118.JPG",
-            "data/6/DSCN2119.JPG",
-            "data/6/DSCN2120.JPG",
-            "data/6/DSCN2121.JPG",
-            "data/6/DSCN2122.JPG",
-        ],
-  "camera": 
-    {focal_length: [2489.14, 2489.14],
-    principal_point: [2466.74, 2466.74]
+  "image_file_names": [
+    "DSCN2115.JPG",
+    "DSCN2116.JPG",
+    "DSCN2117.JPG",
+    "DSCN2118.JPG",
+    "DSCN2119.JPG",
+    "DSCN2120.JPG",
+    "DSCN2121.JPG",
+    "DSCN2122.JPG"
+  ],
+  "camera": {
+    "focal_length": [2489.14, 2489.14],
+    "principal_point": [2466.74, 2466.74]
   },
   "initial_pair": [1, 3]
 }

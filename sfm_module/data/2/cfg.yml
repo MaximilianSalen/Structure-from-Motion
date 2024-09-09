@@ -1,18 +1,18 @@
 {
-  "image_file_paths": [
-            "data/2/DSC_0025.JPG",
-            "data/2/DSC_0026.JPG",
-            "data/2/DSC_0027.JPG",
-            "data/2/DSC_0028.JPG",
-            "data/2/DSC_0029.JPG",
-            "data/2/DSC_0030.JPG",
-            "data/2/DSC_0031.JPG",
-            "data/2/DSC_0032.JPG",
-            "data/2/DSC_0033.JPG",
-        ],
-  "camera": 
-    {focal_length: [2378.51, 2378.51],
-    principal_point: [968, 648]
+  "image_file_names": [
+    "DSC_0025.JPG",
+    "DSC_0026.JPG",
+    "DSC_0027.JPG",
+    "DSC_0028.JPG",
+    "DSC_0029.JPG",
+    "DSC_0030.JPG",
+    "DSC_0031.JPG",
+    "DSC_0032.JPG",
+    "DSC_0033.JPG"
+  ],
+  "camera": {
+    "focal_length": [2378.51, 2378.51],
+    "principal_point": [968, 648]
   },
   "initial_pair": [0, 8]
 }
