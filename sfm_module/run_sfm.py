@@ -7,7 +7,7 @@ import numpy as np
 import yaml
 import os
 from tqdm import tqdm
-from ransac_algorithm import run_ransac
+from ransac_algorithm import estimate_R
 from extract_sift import process_sift_for_image_pairs
 from reconstruct_3D import run_reconstruction
 from estimate_T import get_T, get_correspondences
@@ -82,24 +82,8 @@ def run_sfm():
         dataset=args.dataset,
     )
 
-    # Run RANSAC algorithm
-    RT_list, R_list, T_list = run_ransac(K, x_pairs, pixel_threshold)
-
-    # # Plot Testing code
-    # for i_camera in range(nr_images-1):
-    #     P1 = np.concatenate((np.eye(3), np.zeros((3,1))), axis=1)
-    #     P2 = np.hstack((R_list[i_camera], T_list[i_camera]))
-    #     P1 = K @ P11
-
-    #     P2 = K @ P2
-    #     x1 = x_pairs[i_camera]
-    #     x2 = x_pairs[i_camera+1]
-    #     X_triangulated = auxiliary.triangulate_3D_point_DLT([P1, P2], [x1, x2])
-    #     auxiliary.plot_3d_points_and_cameras(X_triangulated, [P1, P2])
-
-    # im1 = cv2.imread(img_names[0])
-    # im2 = cv2.imread(img_names[1])
-    # auxiliary.project_points([P1, P2], X_triangulated, [im1, im2], [x1, x2])
+    # Run RANSAC algorithm to estimate R
+    R_list = estimate_R(K, x_pairs, pixel_threshold)
 
     X0, absolute_rotations, inliers = run_reconstruction(
         R_list, initial_pair[0], initial_pair[1], K, init_pair[0], pixel_threshold

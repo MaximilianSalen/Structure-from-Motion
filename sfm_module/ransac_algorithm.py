@@ -8,7 +8,7 @@ from homography_to_RT import homography_to_RT
 from essential_to_RT import essential_to_RT
 
 
-def run_ransac(K, x_pairs, pixel_threshold):
+def estimate_R(K, x_pairs, pixel_threshold):
     """
     Runs the RANSAC algorithm on a series of image pairs to estimate rotation and translation matrices.
 
@@ -20,9 +20,8 @@ def run_ransac(K, x_pairs, pixel_threshold):
     Returns:
         tuple: Contains lists of RT (rotation and translation), R (rotation), and T (translation) matrices.
     """
-    RT_list = []
+
     R_list = []
-    T_list = []
 
     for i in tqdm(range(len(x_pairs) // 2), desc="Running RANSAC"):
         start_time = time.time()
@@ -36,20 +35,25 @@ def run_ransac(K, x_pairs, pixel_threshold):
         x2_norm = normalize_K(K, x2)
 
         # Estimate essential matrix with RANSAC and get rotation, translation, and inliers
-        i_R, i_T, inliers = modified_estimate_E_robust(
+        i_R, _, inliers = modified_estimate_E_robust(
             K, x1_norm, x2_norm, pixel_threshold
         )
         elapsed_time = time.time() - start_time
         logging.info(
             f"RANSAC completed for pair {i+1} in {elapsed_time:.2f} seconds with {len(inliers)} inliers"
         )
-        # Append results to respective lists
-        i_RT = [i_R, i_T]
-        RT_list += i_RT
         R_list.append(i_R)
-        T_list.append(i_T)
 
-    return RT_list, R_list, T_list
+    return R_list
+
+
+def run_ransac(K, x1, x2, pixel_threshold):
+    x1_norm = normalize_K(K, x1)
+    x2_norm = normalize_K(K, x2)
+    best_R, best_T, inliers = modified_estimate_E_robust(
+        K, x1_norm, x2_norm, pixel_threshold
+    )
+    return best_R, best_T, inliers
 
 
 def normalize_K(K, xs):
