@@ -6,9 +6,7 @@ from utils import triangulate_3D_point_DLT, log_execution_time
 
 
 @log_execution_time
-def run_reconstruction(
-    relative_rotations, init_x1, init_x2, K, first_init_image_idx, pixel_threshold
-):
+def run_reconstruction(relative_rotations, init_pair_dict, K, pixel_threshold):
     """
     Runs the 3D reconstruction process, computing absolute rotations and
     reconstructing initial 3D points from the input data.
@@ -27,7 +25,10 @@ def run_reconstruction(
     absolute_rotations = compute_absolute_rotations(relative_rotations)
 
     X0, inliers = reconstruct_initial_3D_points(
-        init_x1, init_x2, K, absolute_rotations[first_init_image_idx], pixel_threshold
+        init_pair_dict,
+        K,
+        absolute_rotations[init_pair_dict["init_pair_indices"][0]],
+        pixel_threshold,
     )
     logging.info(
         f"Number of inliers for reconstruction of initial pair: {len(inliers)}"
@@ -56,7 +57,9 @@ def compute_absolute_rotations(relative_rotations: list):
 
 
 @log_execution_time
-def reconstruct_initial_3D_points(x1, x2, K, R_i1, pixel_threshold):
+def reconstruct_initial_3D_points(init_pair_dict, K, R_init, pixel_threshold):
+    x1 = init_pair_dict["x_init"][0]
+    x2 = init_pair_dict["x_init"][1]
     R, T, inliers = run_ransac(K, x1, x2, pixel_threshold)
 
     P1 = np.concatenate((np.eye(3), np.zeros((3, 1))), axis=1)
@@ -66,7 +69,7 @@ def reconstruct_initial_3D_points(x1, x2, K, R_i1, pixel_threshold):
 
     X0 = triangulate_3D_point_DLT(P, xs)
     X0 = X0[:3, :] / X0[3, :]
-    X0 = np.dot(R_i1.T, X0)
+    X0 = np.dot(R_init.T, X0)
 
     return X0, inliers
 

@@ -55,18 +55,24 @@ def process_sift_for_image_pairs(img_paths, init_pair, dataset):
         )
 
     # Attempt to load the initial pair data
-    initial_pair = load_x_pairs(init_pair_filename, save_location)
-    if initial_pair is None:
+    init_pair_dict = load_x_pairs(init_pair_filename, save_location)
+    if init_pair_dict is None:
         start_time = time.time()
         init_imgs = [img_paths[i] for i in init_pair]
         init_x1, init_x2, desc_X = compute_sift_keypoints(init_imgs[0], init_imgs[1])
         elapsed_time = time.time() - start_time
 
         logging.info(f"Initial SIFT extraction completed in {elapsed_time:.2f} seconds")
-        initial_pair = [init_x1, init_x2, desc_X]
+
+        # Save data for initial pair as dictionary
+        init_pair_dict = {
+            "init_pair_indices": init_pair,
+            "x_init": [init_x1, init_x2],
+            "init_pair_desc": desc_X,
+        }
 
         # Save the extracted initial pair
-        save_x_pairs(initial_pair, init_pair_filename, save_location)
+        save_x_pairs(init_pair_dict, init_pair_filename, save_location)
         logging.info(
             f"Initial pair saved to {os.path.join(save_location, init_pair_filename)}"
         )
@@ -75,7 +81,7 @@ def process_sift_for_image_pairs(img_paths, init_pair, dataset):
             f"Initial pair loaded from {os.path.join(save_location, init_pair_filename)}"
         )
 
-    return x_pairs, initial_pair
+    return x_pairs, init_pair_dict
 
 
 def compute_sift_keypoints(image_path1: str, image_path2: str):

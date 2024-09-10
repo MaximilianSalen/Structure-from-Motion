@@ -2,11 +2,6 @@ import numpy as np
 import scipy
 from chirality_check import perform_chirality_check
 
-# def extract_RT_from_H(E, K, x1, x2):
-#     P2s = extract_P_from_E(E)
-#     best_P = perform_chirality_check(P2s, K, x1, x2)
-#     return best_P
-
 
 def essential_to_RT(E, K, x1, x2):
     W = np.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]])

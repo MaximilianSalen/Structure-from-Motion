@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import time
 import logging
 from utils import *
+from visualization import *
 import numpy as np
 import yaml
 import os
@@ -77,19 +78,21 @@ def run_sfm():
     img_paths = [os.path.join(dataset_path, img_name) for img_name in img_names]
 
     # Call the extract_sift_data function
-    x_pairs, initial_pair = process_sift_for_image_pairs(
+    x_pairs, init_pair_dict = process_sift_for_image_pairs(
         img_paths=img_paths,
         init_pair=init_pair,
         dataset=args.dataset,
     )
 
-    # Run RANSAC algorithm to estimate R
+    # Run RANSAC algorithm to estimate relative rotations between consecutive
+    # image pairs
     R_list = estimate_R(K, x_pairs, pixel_threshold)
 
+    # Reconstruct the 3D model from initial pair
     X0, absolute_rotations, inliers = run_reconstruction(
-        R_list, initial_pair[0], initial_pair[1], K, init_pair[0], pixel_threshold
+        R_list, init_pair_dict, K, pixel_threshold
     )
-    desc_X = initial_pair[2]
+    desc_X = init_pair_dict["init_pair_desc"]
     desc_X_inliers = desc_X[:, inliers]
     print("Sum of inliers :", np.sum(inliers))
 
@@ -97,7 +100,7 @@ def run_sfm():
         print("Insufficient amount of inliers change initial pair")
         exit
 
-    # estimate T robustly and store3
+    # estimate T robustly and store
     initial_Ts = []
     start_time = time.time()
     for i in range(nr_images):
