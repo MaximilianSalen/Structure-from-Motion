@@ -1,4 +1,7 @@
+import os
 import time
+import logging
+import pickle
 import numpy as np
 import cv2
 
@@ -103,3 +106,19 @@ def log_execution_time(func):
         return result
 
     return wrapper
+
+
+# Function to save x_pairs using pickle
+def save_x_pairs(data, filename, save_location):
+    file_path = os.path.join(save_location, filename)
+    with open(file_path, "wb") as file:
+        pickle.dump(data, file)
+
+
+# Function to load x_pairs if file exists
+def load_x_pairs(filename, save_location):
+    file_path = os.path.join(save_location, filename)
+    if os.path.exists(file_path):
+        with open(file_path, "rb") as file:
+            return pickle.load(file)
+    return None

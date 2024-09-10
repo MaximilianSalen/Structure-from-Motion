@@ -1,9 +1,10 @@
+import os
+import logging
+import time
 import cv2
 import numpy as np
-import logging
 from tqdm import tqdm
-import time
-from utils import *
+from .utils import *
 
 
 def process_sift_for_image_pairs(img_paths, init_pair, dataset):
