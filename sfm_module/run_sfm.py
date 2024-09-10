@@ -11,7 +11,7 @@ from tqdm import tqdm
 from ransac_algorithm import estimate_R
 from extract_sift import process_sift_for_image_pairs
 from reconstruct_3D import run_reconstruction
-from estimate_T import get_T, get_correspondences
+from estimate_translation import estimate_translation
 from levenberg_marquardt import levenberg_marquardt_optimize_T
 
 # Set up logging
@@ -83,33 +83,33 @@ def run_sfm():
         dataset=args.dataset,
     )
 
-    # Run RANSAC algorithm to estimate relative rotations between consecutive
-    # image pairs
+    # Run RANSAC algorithm to estimate relative rotations between consecutive image pairs
+    logging.info("Running RANSAC to estimate relative rotations between image pairs...")
     R_list = estimate_R(K, x_pairs, pixel_threshold)
 
     # Reconstruct the 3D model from initial pair
+    logging.info("Reconstructing the 3D model from the initial pair...")
     X0, absolute_rotations, inliers = run_reconstruction(
         R_list, init_pair_dict, K, pixel_threshold
     )
     desc_X = init_pair_dict["init_pair_desc"]
     desc_X_inliers = desc_X[:, inliers]
-    print("Sum of inliers :", np.sum(inliers))
 
-    if np.sum(inliers) < 50:
-        print("Insufficient amount of inliers change initial pair")
-        exit
+    num_inliers = np.sum(inliers)
+    logging.info(f"Total number of inliers for initial reconstruction: {num_inliers}")
 
-    # estimate T robustly and store
-    initial_Ts = []
-    start_time = time.time()
-    for i in range(nr_images):
-        # get 2d_3d correspondences
-        X_corr, x_corr_norm = get_correspondences(img_names[i], desc_X, X0, K)
-        init_T = get_T(x_corr_norm, X_corr, K, absolute_rotations[i], pixel_threshold)
-        initial_Ts = initial_Ts + [init_T]
-    end_time = time.time()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed Time Estimate T: {elapsed_time} seconds")
+    if num_inliers < 50:
+        logging.error(
+            "Insufficient number of inliers (<50). Possible solution: change initial pair. Exiting..."
+        )
+        exit()
+    else:
+        logging.info("Sufficient inliers found. Proceeding with reconstruction.")
+
+    # Robustly estimate T
+    initial_Ts = estimate_translation(
+        K, desc_X, X0, absolute_rotations, img_paths, pixel_threshold
+    )
 
     ############
     # for i_camera in range(nr_images-1):
@@ -128,7 +128,7 @@ def run_sfm():
     for i in range(nr_images):
         # get 2d_3d correspondences with only inliers
         X_corr_inlier, x_corr_norm_inlier = get_correspondences(
-            img_names[i], desc_X_inliers, X0, K
+            img_paths[i], desc_X_inliers, X0, K
         )
         X_corr_inliers.append(X_corr_inlier)
         x_corr_norm_inliers.append(x_corr_norm_inlier)

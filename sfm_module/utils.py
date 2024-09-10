@@ -3,6 +3,7 @@ import pickle
 import time
 import logging
 import numpy as np
+import cv2
 
 
 def log_execution_time(func):
@@ -69,6 +70,42 @@ def cartesian_to_homogeneous(cartesian_points):
 
 def homogeneous_to_cartesian(points: np.ndarray) -> np.ndarray:
     return points[:-1, :] / points[-1, :]
+
+
+def skew_symmetric_mat(v: np.array) -> np.array:
+    """Generates a skew-symmetric matrix from a 3D vector."""
+    return np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
+
+
+def get_correspondences(img_path: str, desc_X: np.array, X0: np.array, K: list):
+    """
+    Finds 2D-3D correspondences between image keypoints and reconstructed 3D points.
+
+    Args:
+        img_path (str): Path to the input image.
+        desc_X (np.ndarray): Descriptors of matched 3D points.
+        X0 (np.ndarray): Reconstructed 3D points.
+        K (list): Camera intrinsic matrix.
+
+    Returns:
+        tuple: Corresponding 3D points and normalized 2D points in the image.
+    """
+    image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+    sift = cv2.SIFT_create()
+    keypoints, descriptors = sift.detectAndCompute(image, None)
+
+    matcher = cv2.BFMatcher()
+    matches = matcher.knnMatch(descriptors, desc_X.T, k=2)
+
+    # Filter good matches using the ratio test
+    good_matches = [m for m, n in matches if m.distance < 0.75 * n.distance]
+
+    # Extract corresponding 2D and 3D points
+    x = np.float32([keypoints[m.queryIdx].pt for m in good_matches]).T
+    X = np.float32([X0[:, m.trainIdx] for m in good_matches]).T
+    x_norm = normalize_K(K, cartesian_to_homogeneous(x))
+
+    return X, x_norm
 
 
 # Function to save x_pairs using pickle

@@ -327,8 +327,3 @@ def get_inlier_mask_H(
     mask = distances < threshold
 
     return mask
-
-
-def skew_symmetric_mat(v: np.array) -> np.array:
-    """Generates a skew-symmetric matrix from a 3D vector."""
-    return np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
