@@ -1,6 +1,6 @@
 import numpy as np
 import scipy
-from chirality_check import perform_chirality_check
+from .chirality_check import perform_chirality_check
 
 
 def essential_to_RT(E, K, x1, x2):

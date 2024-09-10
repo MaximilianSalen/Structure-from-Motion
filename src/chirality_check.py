@@ -1,5 +1,5 @@
 import numpy as np
-from utils import triangulate_3D_point_DLT
+from .utils import triangulate_3D_point_DLT
 
 
 def perform_chirality_check(P2s, K, x1, x2):
@@ -16,10 +16,6 @@ def perform_chirality_check(P2s, K, x1, x2):
     )
     best_P = P2s[best_idx]
     return best_P, num_points_infront_of_cam
-
-
-def normalize_K(K, xs):
-    return np.linalg.inv(K) @ xs
 
 
 def count_points_in_front_of_cam(P1, P2, points_3d):

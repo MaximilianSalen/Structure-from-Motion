@@ -1,22 +1,20 @@
 import os
 import argparse
-import time
 import logging
 import matplotlib.pyplot as plt
 import numpy as np
-from tqdm import tqdm
 from utils import *
 from visualization import *
-from ransac_algorithm import estimate_R
-from extract_sift import process_sift_for_image_pairs
-from reconstruct_3D import run_reconstruction
-from estimate_translation import estimate_translation
-from levenberg_marquardt import optimize_translation
+from src import (
+    process_sift_for_image_pairs,
+    estimate_R,
+    run_reconstruction,
+    estimate_translation,
+    optimize_translation,
+)
 
 
-def run_sfm():
-    """Main function to run the structure from motion pipeline."""
-
+def parse_args():
     # Parse arguments
     parser = argparse.ArgumentParser(description="Run Structure-from-Motion pipeline.")
     parser.add_argument("data_path", type=str, help="Base path to the dataset")
@@ -28,7 +26,12 @@ def run_sfm():
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         help="Set the logging level (default: CRITICAL)",
     )
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def run_sfm():
+    """Main function to run the structure from motion pipeline."""
+    args = parse_args()
     dataset_path = os.path.join(args.data_path, args.dataset)
 
     setup_logging(args.verbosity)
@@ -87,6 +90,7 @@ def run_sfm():
     #     auxiliary.plot_3d_points_and_cameras(X_filtered, [P1, P2])
 
     refined_Ts = optimize_translation()
+
     for i_camera in range(nr_images - 1):
         P1 = np.hstack(
             (absolute_rotations[i_camera], np.reshape(estimated_Ts[i_camera], (3, 1)))
