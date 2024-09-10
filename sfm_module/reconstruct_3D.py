@@ -1,26 +1,27 @@
-import time
 import logging
 import numpy as np
-from ransac_algorithm import run_ransac
 from utils import *
+from ransac_algorithm import run_ransac
 
 
 @log_execution_time
 def run_reconstruction(
-    relative_rotations: list, init_pair_dict: dict, K, pixel_threshold: float
+    relative_rotations: list, init_pair_dict: dict, K: list, pixel_threshold: float
 ):
     """
-    Runs the 3D reconstruction process, computing absolute rotations and
-    reconstructing initial 3D points from the input data.
+    Reconstructs initial 3D points from two image views using RANSAC and DLT triangulation.
 
     Args:
-        relative_rotations (list): List of relative rotations between image pairs.
-        init_pair_dict (dict): Dictionary with information for the initial image pair.
-        K (np.ndarray): Camera intrinsic matrix.
-        pixel_threshold (float): Threshold for pixel error in 3D point reconstruction.
+        relative_rotations (list): List of relative rotation matrices between consecutive cameras.
+        init_pair_dict (dict): Dictionary containing matched points (x1, x2) from the initial image pair.
+        K (list): Camera intrinsic matrix.
+        pixel_threshold (float): Threshold for pixel error in RANSAC inlier determination.
 
     Returns:
-        tuple: Contains the reconstructed 3D points (X0), absolute rotations, and inliers.
+        tuple:
+            - X0 (np.ndarray): Reconstructed 3D points in camera 1's coordinate frame.
+            - absolute_rotations (list): Absolute rotation matrices for each camera.
+            - inliers (list): Inliers detected by RANSAC.
     """
     absolute_rotations = compute_absolute_rotations(relative_rotations)
 
@@ -39,10 +40,13 @@ def run_reconstruction(
 @log_execution_time
 def compute_absolute_rotations(relative_rotations: list) -> list:
     """
-    Compute absolute rotations for each camera given relative rotations.
+    Computes absolute rotations for each camera given relative rotations.
 
-    :param relative_rotations: List of relative rotation matrices between consecutive cameras.
-    :return: List of absolute rotation matrices for each camera.
+    Args:
+        relative_rotations (list): List of relative rotation matrices between consecutive cameras.
+
+    Returns:
+        list: Absolute rotation matrices for each camera.
     """
 
     # Initialize the first rotation matrix as identity (assuming the first camera is aligned with the global frame)
@@ -65,13 +69,16 @@ def reconstruct_initial_3D_points(
 
     Args:
         init_pair_dict (dict): Dictionary containing matched points (x1, x2) from the initial image pair.
-        K (np.ndarray): Camera intrinsic matrix.
-        R_init_1 (np.ndarray): Initial rotation matrix for camera 1.
+        K (list): Camera intrinsic matrix.
+        R_init_1 (np.ndarray): Rotation matrix for first image in initial pair.
         pixel_threshold (float): Threshold for pixel error in RANSAC inlier determination.
 
     Returns:
-        tuple: Contains the reconstructed 3D points (X0) and inliers.
+        tuple:
+            - X0 (np.ndarray): Reconstructed 3D points in camera 1's coordinate frame.
+            - inliers (list): Inliers detected by RANSAC.
     """
+
     x1 = init_pair_dict["x_init"][0]
     x2 = init_pair_dict["x_init"][1]
     R, T, inliers = run_ransac(K, x1, x2, pixel_threshold)

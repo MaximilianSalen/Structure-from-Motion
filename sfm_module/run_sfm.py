@@ -18,7 +18,6 @@ from levenberg_marquardt import levenberg_marquardt_optimize_T
 logging.basicConfig(level=logging.INFO)
 
 
-@log_execution_time
 def get_data(path_to_cfg: str):
     """
     Loads camera parameters and image data from a configuration file.
