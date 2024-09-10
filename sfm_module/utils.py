@@ -55,6 +55,10 @@ def pflat(X):
     return X / X[-1, :]
 
 
+def normalize_K(K, xs):
+    return np.linalg.inv(K) @ xs
+
+
 def cartesian_to_homogeneous(cartesian_points):
     # Add a row of ones at the bottom of the cartesian_points matrix
     homogeneous_points = np.vstack(

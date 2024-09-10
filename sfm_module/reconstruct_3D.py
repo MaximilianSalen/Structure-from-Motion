@@ -2,21 +2,21 @@ import time
 import logging
 import numpy as np
 from ransac_algorithm import run_ransac
-from utils import triangulate_3D_point_DLT, log_execution_time
+from utils import *
 
 
 @log_execution_time
-def run_reconstruction(relative_rotations, init_pair_dict, K, pixel_threshold):
+def run_reconstruction(
+    relative_rotations: list, init_pair_dict: dict, K, pixel_threshold: float
+):
     """
     Runs the 3D reconstruction process, computing absolute rotations and
     reconstructing initial 3D points from the input data.
 
     Args:
         relative_rotations (list): List of relative rotations between image pairs.
-        init_x1 (np.ndarray): Keypoints from the first initial image.
-        init_x2 (np.ndarray): Keypoints from the second initial image.
+        init_pair_dict (dict): Dictionary with information for the initial image pair.
         K (np.ndarray): Camera intrinsic matrix.
-        first_init_image_idx (int): Index of the first image in the initial pair.
         pixel_threshold (float): Threshold for pixel error in 3D point reconstruction.
 
     Returns:
@@ -37,7 +37,7 @@ def run_reconstruction(relative_rotations, init_pair_dict, K, pixel_threshold):
 
 
 @log_execution_time
-def compute_absolute_rotations(relative_rotations: list):
+def compute_absolute_rotations(relative_rotations: list) -> list:
     """
     Compute absolute rotations for each camera given relative rotations.
 
@@ -57,7 +57,21 @@ def compute_absolute_rotations(relative_rotations: list):
 
 
 @log_execution_time
-def reconstruct_initial_3D_points(init_pair_dict, K, R_init, pixel_threshold):
+def reconstruct_initial_3D_points(
+    init_pair_dict: dict, K: list, R_init_1: list, pixel_threshold: float
+):
+    """
+    Reconstructs initial 3D points from two image views using RANSAC and DLT triangulation.
+
+    Args:
+        init_pair_dict (dict): Dictionary containing matched points (x1, x2) from the initial image pair.
+        K (np.ndarray): Camera intrinsic matrix.
+        R_init_1 (np.ndarray): Initial rotation matrix for camera 1.
+        pixel_threshold (float): Threshold for pixel error in RANSAC inlier determination.
+
+    Returns:
+        tuple: Contains the reconstructed 3D points (X0) and inliers.
+    """
     x1 = init_pair_dict["x_init"][0]
     x2 = init_pair_dict["x_init"][1]
     R, T, inliers = run_ransac(K, x1, x2, pixel_threshold)
@@ -69,10 +83,6 @@ def reconstruct_initial_3D_points(init_pair_dict, K, R_init, pixel_threshold):
 
     X0 = triangulate_3D_point_DLT(P, xs)
     X0 = X0[:3, :] / X0[3, :]
-    X0 = np.dot(R_init.T, X0)
+    X0 = np.dot(R_init_1.T, X0)
 
     return X0, inliers
-
-
-def normalize_K(K, xs):
-    return np.linalg.inv(K) @ xs

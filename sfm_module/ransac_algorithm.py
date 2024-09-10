@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from scipy.linalg import null_space
 from homography_to_RT import homography_to_RT
 from essential_to_RT import essential_to_RT
+from utils import *
 
 
 def estimate_R(K, x_pairs, pixel_threshold):
@@ -13,7 +14,7 @@ def estimate_R(K, x_pairs, pixel_threshold):
     Runs the RANSAC algorithm on a series of image pairs to estimate rotation and translation matrices.
 
     Args:
-        K (np.ndarray): Camera intrinsic matrix.
+        K (list): Camera intrinsic matrix.
         x_pairs (list): List of corresponding keypoints between image pairs.
         pixel_threshold (float): Pixel distance threshold for RANSAC inlier selection.
 
@@ -35,9 +36,7 @@ def estimate_R(K, x_pairs, pixel_threshold):
         x2_norm = normalize_K(K, x2)
 
         # Estimate essential matrix with RANSAC and get rotation, translation, and inliers
-        i_R, _, inliers = modified_estimate_E_robust(
-            K, x1_norm, x2_norm, pixel_threshold
-        )
+        i_R, _, inliers = estimate_E_robust(K, x1_norm, x2_norm, pixel_threshold)
         elapsed_time = time.time() - start_time
         logging.info(
             f"RANSAC completed for pair {i+1} in {elapsed_time:.2f} seconds with {len(inliers)} inliers"
@@ -50,14 +49,8 @@ def estimate_R(K, x_pairs, pixel_threshold):
 def run_ransac(K, x1, x2, pixel_threshold):
     x1_norm = normalize_K(K, x1)
     x2_norm = normalize_K(K, x2)
-    best_R, best_T, inliers = modified_estimate_E_robust(
-        K, x1_norm, x2_norm, pixel_threshold
-    )
+    best_R, best_T, inliers = estimate_E_robust(K, x1_norm, x2_norm, pixel_threshold)
     return best_R, best_T, inliers
-
-
-def normalize_K(K, xs):
-    return np.linalg.inv(K) @ xs
 
 
 def enforce_essential(E):
@@ -157,8 +150,7 @@ def skew_symmetric_mat(v):
     return np.array([[0, -v[2], v[1]], [v[2], 0, -v[0]], [-v[1], v[0], 0]])
 
 
-def modified_estimate_E_robust(K, x1, x2, pixel_threshold):
-
+def estimate_E_robust(K, x1, x2, pixel_threshold):
     s_E = 8
     s_H = 4
     alpha = 0.95
@@ -187,7 +179,9 @@ def modified_estimate_E_robust(K, x1, x2, pixel_threshold):
         # Update E if there is more inliers than before
         if num_inliers_E > best_num_inliers_E:
             best_num_inliers_E = num_inliers_E
-            # Get R, T (and also number of points infront of camera which is not needed here, therefore "_") from E and set it to best R and T
+
+            # Get R, T (and also number of points infront of camera which is not needed here, therefore "_")
+            # from E and set it to best R and T
             R_best, T_best, _ = essential_to_RT(E_adjusted, K, x1, x2)
             epsilon_E = best_num_inliers_E / x1.shape[1]
             E_iters = np.abs(np.log(1 - alpha) / np.log(1 - epsilon_E**s_E))
@@ -217,7 +211,8 @@ def modified_estimate_E_robust(K, x1, x2, pixel_threshold):
                 epipolar_errors(E_b, x1, x2) ** 2 + epipolar_errors(E_b.T, x2, x1) ** 2
             ) / 2 < err_threshold**2
 
-            # Get R, T and number of inliers that are infront of camera from E and set it to best R and T. Note that the points also satisfy the epipolar constraint due to the mask
+            # Get R, T and number of inliers that are infront of camera from E and set it to best R and T.
+            # Note that the points also satisfy the epipolar constraint due to the mask
             R_best_a, T_best_a, num_inliers_E_a = essential_to_RT(
                 E_a, K, x1[:, inlier_mask_a], x2[:, inlier_mask_a]
             )
@@ -250,36 +245,3 @@ def modified_estimate_E_robust(K, x1, x2, pixel_threshold):
         iterations += 1
 
     return R_best, np.reshape(T_best, (3, 1)), inliers
-
-
-# def modified_estimate_E_robust(K, x1, x2, pixel_threshold):
-
-#     s_E = 8
-#     s_H = 4
-#     alpha = 0.95
-#     epsilon_E = 0.1
-#     epsilon_H = 0.1
-#     best_num_inliers_E = 0
-#     best_num_inliers_H = 0
-#     err_threshold = pixel_threshold / K[0][0]
-
-#     # initial nr of iterations for E and H
-#     E_iters = np.abs(np.log(1-alpha)/np.log(1-epsilon_E**s_E))
-#     H_iters = np.abs(np.log(1-alpha)/np.log(1-epsilon_H**s_H))
-
-#     for i in range(100000):
-#       ###### Estimate E ######
-#         inds_E = np.random.randint(0, x1.shape[1], size=s_E)
-#         E_adjusted = enforce_essential(estimate_F_DLT(x1[:, inds_E], x2[:, inds_E]))
-#         inlier_mask = (epipolar_errors(E_adjusted, x1, x2)**2 + epipolar_errors(E_adjusted.T, x2, x1)**2) / 2 < err_threshold**2
-#         num_inliers_E = np.sum(inlier_mask)
-
-#         # Update E if there is more inliers than before
-#         if num_inliers_E > best_num_inliers_E:
-#             best_num_inliers_E = num_inliers_E
-#             # Get R, T (and also number of points infront of camera which is not needed here, therefore "_") from E and set it to best R and T
-#             R_best, T_best, _ = essential_to_RT(E_adjusted, K, x1, x2)
-#             epsilon_E = best_num_inliers_E / x1.shape[1]
-#             E_iters = np.abs(np.log(1-alpha)/np.log(1-epsilon_E**s_E))
-
-#     return R_best, np.reshape(T_best, (3,1))
