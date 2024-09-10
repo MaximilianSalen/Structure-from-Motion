@@ -2,18 +2,14 @@ import os
 import argparse
 import logging
 import pickle
-import matplotlib.pyplot as plt
 import numpy as np
 from utils import *
-from visualization import *
 from src import (
     process_sift_for_image_pairs,
     estimate_R,
     run_reconstruction,
     estimate_translation,
     refine_translation,
-    triangulate_3D_point_DLT,
-    filter_3D_points,
 )
 
 
@@ -103,75 +99,6 @@ def run_sfm():
         )
 
     logging.info("Structure-from-Motion pipeline completed and results saved.")
-
-    # for i_camera in range(nr_images - 1):
-    #     P1 = np.hstack(
-    #         (absolute_rotations[i_camera], np.reshape(estimated_Ts[i_camera], (3, 1)))
-    #     )
-    #     P2 = np.hstack(
-    #         (
-    #             absolute_rotations[i_camera + 1],
-    #             np.reshape(estimated_Ts[i_camera + 1], (3, 1)),
-    #         )
-    #     )
-    #     P1 = K @ P1
-    #     P2 = K @ P2
-    #     x1 = x_pairs[2 * i_camera]
-    #     x2 = x_pairs[2 * i_camera + 1]
-    #     X_triangulated = triangulate_3D_point_DLT([P1, P2], [x1, x2])
-    #     X_filtered = filter_3D_points(X_triangulated)
-    #     plot_3d_points_and_cameras(X_filtered, [P1, P2])
-
-    # fig = plt.figure(figsize=(10, 8))
-    # ax = fig.add_subplot(111, projection="3d")
-    # ax.set_xlabel("X")
-    # ax.set_ylabel("Y")
-    # ax.set_zlabel("Z")
-    # ax.set_title("3D Points and Camera Positions")
-    # ax.axis("equal")
-
-    # colors = [
-    #     "blue",
-    #     "green",
-    #     "red",
-    #     "cyan",
-    #     "magenta",
-    #     "yellow",
-    #     "black",
-    #     "orange",
-    #     "purple",
-    #     "brown",
-    #     "pink",
-    #     "gray",
-    #     "olive",
-    #     "navy",
-    #     "lightblue",
-    #     "lightgreen",
-    #     "coral",
-    #     "beige",
-    #     "indigo",
-    #     "lime",
-    #     "maroon",
-    #     "teal",
-    #     "rose",
-    #     "mustard",
-    #     "turquoise",
-    #     "sienna",
-    #     "plum",
-    #     "orchid",
-    #     "lavender",
-    # ]
-    # for i_camera in range(nr_images - 1):
-    #     P1 = np.hstack((absolute_rotations[i_camera], refined_Ts[i_camera]))
-    #     P2 = np.hstack((absolute_rotations[i_camera + 1], refined_Ts[i_camera + 1]))
-    #     P1 = K @ P1
-    #     P2 = K @ P2
-    #     x1 = x_pairs[2 * i_camera]
-    #     x2 = x_pairs[2 * i_camera + 1]
-    #     X_triangulated = triangulate_3D_point_DLT([P1, P2], [x1, x2])
-    #     X_filtered = filter_3D_points(X_triangulated)
-    #     plot_3d_points_and_cameras_new(X_filtered, [P1, P2], ax, colors[i_camera])
-    # plt.show()
 
 
 if __name__ == "__main__":
