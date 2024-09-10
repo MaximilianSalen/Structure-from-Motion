@@ -25,6 +25,7 @@ def parse_args():
         "--verbosity",
         type=str,
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        default="ERROR",
         help="Set the logging level (default: CRITICAL)",
     )
     return parser.parse_args()
@@ -64,14 +65,6 @@ def run_sfm():
 
     num_inliers = np.sum(inliers)
     logging.info(f"Total number of inliers for initial reconstruction: {num_inliers}")
-
-    if num_inliers < 50:
-        logging.error(
-            "Insufficient number of inliers (<50). Possible solution: change initial pair. Exiting..."
-        )
-        exit()
-    else:
-        logging.info("Sufficient inliers found. Proceeding with reconstruction.")
 
     # Robustly estimate T
     estimated_Ts = estimate_translation(

@@ -107,7 +107,7 @@ def estimate_E_robust(K: list, x1: np.array, x2: np.array, pixel_threshold: floa
 
             # Get R, T (and also number of points infront of camera which is not needed here, therefore "_")
             # from E and set it to best R and T
-            R_best, T_best, _ = essential_to_RT(E_adjusted, K, x1, x2)
+            R_best, T_best, _ = essential_to_RT(E_adjusted, x1, x2)
             epsilon_E = best_num_inliers_E / x1.shape[1]
             E_iters = np.abs(np.log(1 - alpha) / np.log(1 - epsilon_E**s_E))
             inliers = inlier_mask
