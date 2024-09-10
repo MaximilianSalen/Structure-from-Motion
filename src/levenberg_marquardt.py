@@ -1,4 +1,39 @@
 import numpy as np
+from utils import *
+
+
+def optimize_translation(
+    K,
+    img_paths,
+    desc_X_inliers,
+    X0,
+    estimated_Ts,
+    absolute_rotations,
+):
+    X_corr_inliers = []
+    x_corr_norm_inliers = []
+    for i in range(len(img_paths)):
+
+        # Find 2D-3D correspondences with only inliers
+        X_corr_inlier, x_corr_norm_inlier = find_correspondences(
+            img_paths[i], desc_X_inliers, X0, K
+        )
+        X_corr_inliers.append(X_corr_inlier)
+        x_corr_norm_inliers.append(x_corr_norm_inlier)
+
+    # Refine T with Levenberg_marquardt
+    refined_Ts = []
+    for i, estimated_T in enumerate(estimated_Ts):
+        refined_T = levenberg_marquardt_optimize_T(
+            K,
+            absolute_rotations[i],
+            X_corr_inliers[i],
+            x_corr_norm_inliers[i],
+            estimated_T,
+            num_iterations=10,
+            mu=0.01,
+        )
+        refined_Ts = refined_Ts + [refined_T]
 
 
 def levenberg_marquardt_optimize_T(K, R, X, x_norm, T_initial, num_iterations, mu):
@@ -35,37 +70,6 @@ def compute_reprojection_error(X, x_norm, K, R, T):
     return errors.flatten()
 
 
-# def levenberg_marquardt_optimize_T(K, R, X, x_norm, T_initial, num_iterations, mu):
-#     T = np.copy(T_initial)
-
-#     for _ in range(num_iterations):
-#         error_tot = np.array([])
-#         J_tot = np.array([]).reshape(0, 3)
-
-#         for j in range(X.shape[1]):
-#             # Get error
-#             error_j = compute_reprojection_error(X[:, j], x_norm[:, j], K, R, T)
-#             # Get jacobian
-#             J_j = projection_derivatives_wrt_T(X[:, j], K, R, T)
-
-#             # stack error and J for the j_th 3D point
-#             error_tot = np.concatenate((error_tot, error_j))
-#             J_tot = np.vstack((J_tot, J_j))
-
-#         delta_T = ComputeUpdate(error_tot, J_tot, mu)
-#         T += delta_T
-
-#     return np.reshape(T, (3,1))
-
-# def compute_reprojection_error(X, x_norm, K, R, T):
-#     x_projected = R @ X + T
-
-#     x_projected /= x_projected[2] # Normalize to 2D
-
-#     error = x_projected[:2] - x_norm[:2]
-#     return error
-
-
 def ComputeUpdate(error, J, mu):
     C = J.T @ J + mu * np.eye(J.shape[1])
     c = J.T @ error
@@ -99,11 +103,3 @@ def projection_derivatives_wrt_T(X, K, R, T):
         J[1, i] = dx2_norm_dTi
 
     return J
-
-
-def cartesian_to_homogeneous(cartesian_points):
-    # Add a row of ones at the bottom of the cartesian_points matrix
-    homogeneous_points = np.vstack(
-        (cartesian_points, np.ones((1, cartesian_points.shape[1])))
-    )
-    return homogeneous_points

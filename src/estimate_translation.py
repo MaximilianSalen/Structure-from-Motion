@@ -30,7 +30,7 @@ def estimate_translation(
 
     # Iterate over the number of images
     for i in tqdm(range(len(img_paths)), desc="Estimating translation vectors:"):
-        X_corr, x_corr_norm = get_correspondences(img_paths[i], desc_X, X0, K)
+        X_corr, x_corr_norm = find_correspondences(img_paths[i], desc_X, X0, K)
         init_T = robust_estimate_T(
             x_corr_norm, X_corr, K, absolute_rotations[i], pixel_threshold
         )

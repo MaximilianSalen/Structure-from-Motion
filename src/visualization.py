@@ -4,6 +4,38 @@ import matplotlib.pyplot as plt
 from scipy.linalg import null_space
 from utils import *
 
+COLORS = [
+    "blue",
+    "green",
+    "red",
+    "cyan",
+    "magenta",
+    "yellow",
+    "black",
+    "orange",
+    "purple",
+    "brown",
+    "pink",
+    "gray",
+    "olive",
+    "navy",
+    "lightblue",
+    "lightgreen",
+    "coral",
+    "beige",
+    "indigo",
+    "lime",
+    "maroon",
+    "teal",
+    "rose",
+    "mustard",
+    "turquoise",
+    "sienna",
+    "plum",
+    "orchid",
+    "lavender",
+]
+
 
 def plot_3d_points_and_cameras_new(X, P, ax, color):
     """
