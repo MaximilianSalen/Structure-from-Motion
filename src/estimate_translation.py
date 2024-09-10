@@ -4,6 +4,7 @@ from scipy.linalg import lstsq
 from .utils import *
 
 
+@log_execution_time
 def estimate_translation(
     K: list,
     desc_X: np.array,

@@ -2,6 +2,7 @@ import numpy as np
 from .utils import *
 
 
+@log_execution_time
 def refine_translation(
     K: list,
     img_paths: list,
