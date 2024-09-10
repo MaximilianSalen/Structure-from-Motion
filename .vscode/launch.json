@@ -8,9 +8,9 @@
             "program": "${file}", // Points to the current file
             "console": "integratedTerminal", // Runs in the VSCode terminal
             "args": [
-                "/home/simsom/work_space/repos/Structure-from-motion/sfm_module/data", // Example argument: file path
+                "data", // Example argument: file path
                 "1", // Example argument: dataset name
-                "1.0" // Example argument: threshold
+                "1.0", // Example argument: threshold
             ]
         }
     ]

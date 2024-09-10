@@ -1,7 +1,7 @@
 import numpy as np
 from tqdm import tqdm
 from scipy.linalg import lstsq
-from utils import *
+from .utils import *
 
 
 def estimate_translation(

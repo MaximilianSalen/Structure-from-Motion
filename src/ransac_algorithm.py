@@ -340,10 +340,10 @@ def homography_to_RT(H: np.array, x1: np.array, x2: np.array):
 
     Returns:
         tuple:
-            - R1 (np.ndarray): First possible rotation matrix.
-            - t1 (np.ndarray): First possible translation vector.
-            - R2 (np.ndarray): Second possible rotation matrix.
-            - t2 (np.ndarray): Second possible translation vector.
+            R1 (np.ndarray): First possible rotation matrix.
+            t1 (np.ndarray): First possible translation vector.
+            R2 (np.ndarray): Second possible rotation matrix.
+            t2 (np.ndarray): Second possible translation vector.
     """
 
     def unitize(a, b):
@@ -415,9 +415,9 @@ def essential_to_RT(E: np.array, K: list, x1: np.array, x2: np.array):
 
     Returns:
         tuple:
-            - best_R (np.ndarray): Best estimated rotation matrix.
-            - best_T (np.ndarray): Best estimated translation vector.
-            - num_points_infront_of_cam (int): Number of points in front of the camera.
+            best_R (np.ndarray): Best estimated rotation matrix.
+            best_T (np.ndarray): Best estimated translation vector.
+            num_points_infront_of_cam (int): Number of points in front of the camera.
     """
     W = np.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]])
 

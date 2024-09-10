@@ -10,7 +10,7 @@ from src import (
     estimate_R,
     run_reconstruction,
     estimate_translation,
-    optimize_translation,
+    refine_translation,
     triangulate_3D_point_DLT,
     filter_3D_points,
 )
@@ -91,7 +91,10 @@ def run_sfm():
     #     X_filtered = auxiliary.filter_3D_points(X_triangulated)
     #     auxiliary.plot_3d_points_and_cameras(X_filtered, [P1, P2])
 
-    refined_Ts = optimize_translation()
+    # Refine each T using Levenberg-Marquardt algorithm
+    refined_Ts = refine_translation(
+        K, img_paths, desc_X_inliers, X0, absolute_rotations, estimated_Ts
+    )
 
     for i_camera in range(nr_images - 1):
         P1 = np.hstack(
