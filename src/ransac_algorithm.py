@@ -140,10 +140,10 @@ def estimate_E_robust(K: list, x1: np.array, x2: np.array, pixel_threshold: floa
             # Get R, T and number of inliers that are infront of camera from E and set it to best R and T.
             # Note that the points also satisfy the epipolar constraint due to the mask
             R_best_a, T_best_a, num_inliers_E_a = essential_to_RT(
-                E_a, K, x1[:, inlier_mask_a], x2[:, inlier_mask_a]
+                E_a, x1[:, inlier_mask_a], x2[:, inlier_mask_a]
             )
             R_best_b, T_best_b, num_inliers_E_b = essential_to_RT(
-                E_b, K, x1[:, inlier_mask_b], x2[:, inlier_mask_b]
+                E_b, x1[:, inlier_mask_b], x2[:, inlier_mask_b]
             )
 
             if num_inliers_E_a > num_inliers_E_b:
@@ -403,7 +403,7 @@ def homography_to_RT(H: np.array, x1: np.array, x2: np.array):
     return R1, t1, R2, t2
 
 
-def essential_to_RT(E: np.array, K: list, x1: np.array, x2: np.array):
+def essential_to_RT(E: np.array, x1: np.array, x2: np.array):
     """
     Decomposes the essential matrix into possible rotation (R) and translation (T) matrices.
 
@@ -436,7 +436,7 @@ def essential_to_RT(E: np.array, K: list, x1: np.array, x2: np.array):
 
     # Perform chirality check to find the best projection matrix
     best_P, num_points_infront_of_cam = perform_chirality_check(
-        [P1, P2, P3, P4], K, x1, x2
+        [P1, P2, P3, P4], x1, x2
     )
 
     # Extract the best rotation and translation matrices
