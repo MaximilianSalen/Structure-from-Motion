@@ -329,12 +329,28 @@ def get_inlier_mask_H(
     return mask
 
 
-def homography_to_RT(H, x1, x2):
+def homography_to_RT(H: np.array, x1: np.array, x2: np.array):
+    """
+    Decomposes a homography matrix into possible rotation (R) and translation (T) pairs.
+
+    Args:
+        H (np.ndarray): Homography matrix (3x3).
+        x1 (np.ndarray): Keypoints from the first image.
+        x2 (np.ndarray): Corresponding keypoints from the second image.
+
+    Returns:
+        tuple:
+            - R1 (np.ndarray): First possible rotation matrix.
+            - t1 (np.ndarray): First possible translation vector.
+            - R2 (np.ndarray): Second possible rotation matrix.
+            - t2 (np.ndarray): Second possible translation vector.
+    """
+
     def unitize(a, b):
         denom = 1.0 / np.sqrt(a**2 + b**2)
         return a * denom, b * denom
 
-    # Check the right sign for H
+    # Ensure that the homography matrix H has the correct sign
     N = x1.shape[1]
     if x1.shape[0] != 3:
         x1 = np.vstack([x1, np.ones((1, N))])
@@ -344,23 +360,35 @@ def homography_to_RT(H, x1, x2):
     if positives < N / 2:
         H *= -1
 
+    # Perform SVD on the homography matrix
     U, S, Vt = np.linalg.svd(H)
     s1 = S[0] / S[1]
     s3 = S[2] / S[1]
-    zeta = s1 - s3
+
+    # Compute parameters for the rotation and translation matrices
     a1 = np.sqrt(1 - s3**2)
     b1 = np.sqrt(s1**2 - 1)
     a, b = unitize(a1, b1)
     c, d = unitize(1 + s1 * s3, a1 * b1)
     e, f = unitize(-b / s1, -a / s3)
+
+    # Extract vectors from the Vt matrix
     v1 = Vt.T[:, 0]
     v3 = Vt.T[:, 2]
+
+    # Compute possible normal vectors
     n1 = b * v1 - a * v3
     n2 = b * v1 + a * v3
+
+    # Compute the two possible rotation matrices
     R1 = U @ np.array([[c, 0, d], [0, 1, 0], [-d, 0, c]]) @ Vt
     R2 = U @ np.array([[c, 0, -d], [0, 1, 0], [d, 0, c]]) @ Vt
+
+    # Compute the two possible translation vectors
     t1 = e * v1 + f * v3
     t2 = e * v1 - f * v3
+
+    # Adjust signs of normal vectors and translations
     if n1[2] < 0:
         t1 = -t1
         n1 = -n1
@@ -368,26 +396,51 @@ def homography_to_RT(H, x1, x2):
         t2 = -t2
         n2 = -n2
 
-    # Move from Triggs' convention to H&Z notation
+    # Transform translations to Hartley and Zisserman convention
     t1 = np.dot(R1, t1)
     t2 = np.dot(R2, t2)
 
     return R1, t1, R2, t2
 
 
-def essential_to_RT(E, K, x1, x2):
+def essential_to_RT(E: np.array, K: list, x1: np.array, x2: np.array):
+    """
+    Decomposes the essential matrix into possible rotation (R) and translation (T) matrices.
+
+    Args:
+        E (np.ndarray): Essential matrix.
+        K (list): Camera intrinsic matrix.
+        x1 (np.ndarray): Keypoints from the first image.
+        x2 (np.ndarray): Corresponding keypoints from the second image.
+
+    Returns:
+        tuple:
+            - best_R (np.ndarray): Best estimated rotation matrix.
+            - best_T (np.ndarray): Best estimated translation vector.
+            - num_points_infront_of_cam (int): Number of points in front of the camera.
+    """
     W = np.array([[0, -1, 0], [1, 0, 0], [0, 0, 1]])
+
+    # Perform SVD on the essential matrix
     U, S, Vt = scipy.linalg.svd(E)
+
+    # Ensure the determinant of U and Vt is positive
     if np.linalg.det(U) * np.linalg.det(Vt) < 0:
         Vt = -Vt
+
+    # Compute four possible projection matrices
     P1 = np.hstack((U @ W @ Vt, U[:, -1].reshape(-1, 1)))
     P2 = np.hstack((U @ W @ Vt, -U[:, -1].reshape(-1, 1)))
     P3 = np.hstack((U @ W.T @ Vt, U[:, -1].reshape(-1, 1)))
     P4 = np.hstack((U @ W.T @ Vt, -U[:, -1].reshape(-1, 1)))
 
+    # Perform chirality check to find the best projection matrix
     best_P, num_points_infront_of_cam = perform_chirality_check(
         [P1, P2, P3, P4], K, x1, x2
     )
+
+    # Extract the best rotation and translation matrices
     best_R = best_P[:, :3]
     best_T = best_P[:, 3]
+
     return best_R, best_T, num_points_infront_of_cam
