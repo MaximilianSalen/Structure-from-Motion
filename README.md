@@ -92,4 +92,63 @@ The 3D reconstruction animation will be saved to:
 </div>
 
 
-## Reconstruct your own scene!
+## Reconstruct Your Own Scene!
+
+To reconstruct your own 3D scene, you'll need:
+1. A set of images.
+2. A configuration file (`cfg.yml`) that contains camera and image metadata.
+
+### Step 1: Prepare Your Images
+For optimal results with the 3D reconstruction framework, it is essential that your images meet certain criteria:
+
+- **Overlapping Views**: The images should have overlapping areas, with objects appearing in multiple images from different angles. A 60-80% overlap between consecutive images is generally ideal.
+- **Wide Baseline**: Take photos from different viewpoints or angles, ensuring that the relative positions of objects in the scene vary across the images. A wider baseline (the distance between the camera positions) will help capture depth.
+- **Good Lighting**: Ensure that the images are well-lit with minimal shadows or variations in lighting across the images.
+- **No Motion Blur**: The images should be sharp and free of motion blur, which could negatively affect the feature extraction process.
+- **High Resolution**: Use high-resolution images to capture more detail in the scene, but keep the image sizes manageable for processing. Typically, images between 1,000 and 3,000 pixels on the long side work well.
+- **Static Scene**: The scene should remain static while capturing the images to ensure consistency in the reconstruction.
+
+### Step 2: Create a `cfg.yml` File
+You will need to create a `cfg.yml` file with the following structure to describe the camera setup and image filenames.
+
+```yaml
+{
+  "image_file_names": [ # Replace with your image filenames
+    "image1.JPG",
+    "image2.JPG",
+    "image3.JPG",
+    "image4.JPG",
+    "image5.JPG",
+    "image7.JPG",
+    "image6.JPG",
+    ...
+  ],
+  "camera": {
+    "focal_length": [fx, fy],  # Replace with the focal length values of your camera
+    "principal_point": [cx, cy]  # Replace with the principal point coordinates (optical center)
+  },
+  "initial_pair": [4, 6]  # Indices of the initial image pair for 3D reconstruction
+}
+```
+
+### Step 3: Run Reconstruction
+With this inplace you can run the program with your dataset and `cfg.yml` and view the result inside `/output/rotation_dataset_<name_of_dataset>.gif`.
+
+
+### Why Does the Reconstruction Pipeline Break?
+
+While the 3D reconstruction pipeline is designed to handle a wide range of image datasets, there are certain conditions where the process may fail or produce poor results. Here are some common reasons why the reconstruction pipeline might break or underperform:
+
+1. **Insufficient Overlap Between Images**: If consecutive images don’t have enough overlapping features, the pipeline may fail to extract and match keypoints, making it impossible to compute relative rotations or perform triangulation.
+
+2. **Poor Image Quality**: Blurry, noisy, or low-resolution images can result in poor feature extraction, making it difficult for the algorithm to match keypoints and construct a 3D model. Ensure your images are sharp and clear for optimal results.
+
+3. **Moving Objects**: If there are moving objects in the scene, they will appear in different positions across the images, which can confuse the feature-matching process and lead to erroneous reconstructions. It is essential to ensure that the scene remains static while taking the images.
+
+4. **Incorrect Camera Calibration**: Errors in the camera parameters (focal length, principal point, etc.) specified in the `cfg.yml` file can cause the reconstruction to break, as the pipeline relies on accurate camera calibration for key operations like triangulation and projection.
+
+5. **Inconsistent Lighting**: Large changes in lighting or shadows between images can make it difficult to extract consistent features and cause keypoint mismatches. Aim for evenly lit scenes with minimal shadows.
+
+6. **Incorrect Initial Pair**: If the initial image pair chosen for reconstruction does not have sufficient overlap or is not representative of the entire scene, the pipeline might fail to build an initial 3D model. Make sure the `initial_pair` in the `cfg.yml` file corresponds to images that are well-suited for triangulation.
+
+By ensuring that the dataset avoids these pitfalls, the reconstruction pipeline is more likely to succeed and produce high-quality 3D reconstructions.
