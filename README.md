@@ -15,7 +15,7 @@ Create a conda virtual environment and activate it using the following shell scr
 ./build_conda.sh
 ```
 
-If you prefer aren't using linux and want to directly get the dependencies:
+If prefer to directly get the dependencies:
 ```bash
 pip install -r requirements.txt
 ```
