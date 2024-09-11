@@ -84,7 +84,8 @@ python3 run_sfm.py --data_path data --dataset 5 --threshold 1.0 --verbosity INFO
 python3 visualization.py --dataset <name_of_dataset>
 ```
 
-The 3D-reconstruction animation is saved to "/output/rotation_dataset_<name_of_dataset>.gif"
+The 3D reconstruction animation will be saved to: 
+`/output/rotation_dataset_<name_of_dataset>.gif`
 
 <div style="text-align: center;">
   <img src="./docs/images/rotation_dataset_5.gif" width="400"/>
