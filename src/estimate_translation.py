@@ -30,7 +30,7 @@ def estimate_translation(
     initial_Ts = []
 
     # Iterate over the number of images
-    for i in tqdm(range(len(img_paths)), desc="Estimating translation vectors:"):
+    for i in tqdm(range(len(img_paths)), desc="Estimating translation vectors"):
         X_corr, x_corr_norm = find_correspondences(img_paths[i], desc_X, X0, K)
         init_T = robust_estimate_T(
             x_corr_norm, X_corr, K, absolute_rotations[i], pixel_threshold
@@ -74,7 +74,6 @@ def robust_estimate_T(x_norm, X, K, R, pixel_threshold):
             max_num_inliers = num_inliers
             best_T = T_estimated
 
-    print(f"Number of inliers T: {max_num_inliers}")
     return best_T
 
 

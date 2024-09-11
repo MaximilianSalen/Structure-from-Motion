@@ -19,14 +19,17 @@ def parse_args():
     parser.add_argument("--data_path", type=str, help="Base path to the dataset")
     parser.add_argument("--dataset", type=str, help="Name of the dataset")
     parser.add_argument(
-        "--threshold", type=float, default=1.0, help="Pixel threshold for matching"
+        "--threshold",
+        type=float,
+        default=1.0,
+        help="Pixel threshold for matching (default: 1.0)",
     )
     parser.add_argument(
         "--verbosity",
         type=str,
         choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
         default="ERROR",
-        help="Set the logging level (default: CRITICAL)",
+        help="Set the logging level (default: ERROR)",
     )
     return parser.parse_args()
 
