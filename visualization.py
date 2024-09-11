@@ -1,7 +1,5 @@
 import argparse
 import pickle
-import matplotlib.pyplot as plt
-import numpy as np
 from utils import *
 
 COLORS = [
@@ -41,6 +39,13 @@ def parse_args():
     # Parse arguments
     parser = argparse.ArgumentParser(description="Visualize 3D-Reconstruction.")
     parser.add_argument("dataset", type=str, help="Name of the dataset")
+    parser.add_argument("--save_path", type=str, help="Path to save the animated GIF")
+    parser.add_argument(
+        "--tag",
+        type=str,
+        default="sfm_rotation",
+        help="Tag for the saved file name (default: 'sfm_rotation')",
+    )
     return parser.parse_args()
 
 
@@ -60,8 +65,17 @@ def visualize_results():
     x_pairs = data["x_pairs"]
     nr_images = data["nr_images"]
 
-    # Call the utility function to visualize the results
-    visualize_sfm_results(K, absolute_rotations, refined_Ts, x_pairs, nr_images, COLORS)
+    # Visualize and animate the SfM results
+    visualize_sfm_results_with_rotation(
+        K=K,
+        absolute_rotations=absolute_rotations,
+        refined_Ts=refined_Ts,
+        x_pairs=x_pairs,
+        nr_images=nr_images,
+        colors=COLORS,
+        save_path=args.save_path,
+        tag=args.tag,
+    )
 
 
 if __name__ == "__main__":

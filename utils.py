@@ -2,8 +2,9 @@ import os
 import logging
 import yaml
 import numpy as np
-import cv2
+from tqdm import tqdm
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 from scipy.linalg import null_space
 from src import (
     pflat,
@@ -177,11 +178,18 @@ def project_points(Ps, X, imgs, xs):
     plt.show()
 
 
-def visualize_sfm_results(
-    K, absolute_rotations, refined_Ts, x_pairs, nr_images, colors
+def visualize_sfm_results_with_rotation(
+    K,
+    absolute_rotations,
+    refined_Ts,
+    x_pairs,
+    nr_images,
+    colors,
+    save_path=None,
+    tag="sfm",
 ):
     """
-    Visualizes the 3D points and camera positions in a 3D plot.
+    Visualizes the 3D points and camera positions in a rotating 3D plot, and saves it as an animated GIF.
 
     Args:
         K (np.ndarray): Camera intrinsic matrix.
@@ -190,15 +198,22 @@ def visualize_sfm_results(
         x_pairs (list): List of keypoint pairs between consecutive images.
         nr_images (int): Number of images in the sequence.
         colors (list): List of colors to use for the camera visualizations.
+        save_path (str, optional): Path to save the animated plot. If None, the plot is displayed interactively.
+        tag (str, optional): Tag for the saved GIF filename.
     """
-    # Set up the 3D plot
+
+    def rotate(angle):
+        ax.view_init(elev=30, azim=angle, vertical_axis="y")
+
+    # Create a figure and a 3D axis
     fig = plt.figure(figsize=(10, 8))
     ax = fig.add_subplot(111, projection="3d")
     ax.set_xlabel("X")
     ax.set_ylabel("Y")
     ax.set_zlabel("Z")
     ax.set_title("3D Points and Camera Positions")
-    ax.axis("equal")
+    ax.invert_yaxis()  # Invert Y-axis
+    # ax.axis("equal")
 
     # Loop through the camera positions and visualize the points and cameras
     for i_camera in range(nr_images - 1):
@@ -222,5 +237,20 @@ def visualize_sfm_results(
         # Plot the filtered 3D points and camera positions
         plot_3d_points_and_cameras_new(X_filtered, [P1, P2], ax, colors[i_camera])
 
-    # Display the 3D plot
-    plt.show()
+    # Create a progress bar for the rotation
+    pbar = tqdm(total=120, desc="Generating Frames", unit="frame")
+
+    def update_frame(angle):
+        rotate(angle)
+        pbar.update(1)  # Update the progress bar
+
+    # Create the animation
+    rot_animation = animation.FuncAnimation(
+        fig, update_frame, frames=np.arange(0, 360, 3), interval=100
+    )
+
+    if not os.path.exists(save_path):
+        os.makedirs(save_path, exist_ok=True)
+    rot_animation.save(f"{save_path}/rotation_{tag}.gif", dpi=60, writer="pillow")
+    pbar.close()
+    print(f"Animation saved to {save_path}/rotation_{tag}.gif")
