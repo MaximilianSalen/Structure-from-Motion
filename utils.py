@@ -179,14 +179,9 @@ def project_points(Ps, X, imgs, xs):
 
 
 def visualize_sfm_results_with_rotation(
-    K,
-    absolute_rotations,
-    refined_Ts,
-    x_pairs,
-    nr_images,
+    sfm_data_dict,
+    dataset_name,
     colors,
-    save_path=None,
-    tag="sfm",
 ):
     """
     Visualizes the 3D points and camera positions in a rotating 3D plot, and saves it as an animated GIF.
@@ -201,6 +196,11 @@ def visualize_sfm_results_with_rotation(
         save_path (str, optional): Path to save the animated plot. If None, the plot is displayed interactively.
         tag (str, optional): Tag for the saved GIF filename.
     """
+    K = sfm_data_dict["K"]
+    absolute_rotations = sfm_data_dict["absolute_rotations"]
+    refined_Ts = sfm_data_dict["refined_Ts"]
+    x_pairs = sfm_data_dict["x_pairs"]
+    nr_images = sfm_data_dict["nr_images"]
 
     def rotate(angle):
         ax.view_init(elev=30, azim=angle, vertical_axis="y")
@@ -249,8 +249,10 @@ def visualize_sfm_results_with_rotation(
         fig, update_frame, frames=np.arange(0, 360, 3), interval=100
     )
 
-    if not os.path.exists(save_path):
-        os.makedirs(save_path, exist_ok=True)
-    rot_animation.save(f"{save_path}/rotation_{tag}.gif", dpi=60, writer="pillow")
+    if not os.path.exists("output"):
+        os.makedirs("output", exist_ok=True)
+    rot_animation.save(
+        f"output/rotation_dataset_{dataset_name}.gif", dpi=60, writer="pillow"
+    )
     pbar.close()
-    print(f"Animation saved to {save_path}/rotation_{tag}.gif")
+    print(f"Animation saved to output/rotation_dataset_{dataset_name}.gif")

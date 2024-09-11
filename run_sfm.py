@@ -16,10 +16,10 @@ from src import (
 def parse_args():
     # Parse arguments
     parser = argparse.ArgumentParser(description="Run Structure-from-Motion pipeline.")
-    parser.add_argument("data_path", type=str, help="Base path to the dataset")
-    parser.add_argument("dataset", type=str, help="Name of the dataset")
+    parser.add_argument("--data_path", type=str, help="Base path to the dataset")
+    parser.add_argument("--dataset", type=str, help="Name of the dataset")
     parser.add_argument(
-        "threshold", type=float, default=1.0, help="Pixel threshold for matching"
+        "--threshold", type=float, default=1.0, help="Pixel threshold for matching"
     )
     parser.add_argument(
         "--verbosity",

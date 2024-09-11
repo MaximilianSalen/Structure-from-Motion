@@ -5,7 +5,7 @@
 This project is a 3D reconstruction software that utilizes structure from motion (SfM) to generate accurate 3D models. Given a dataset of 2D images, the software reconstructs a 3D scene in the form of a point cloud, while also determining the camera positions used during the image capture. The final output includes a detailed 3D point cloud representing the structure and the spatial configuration of the cameras (see Figures 1 and 2).
 
 <div style="text-align: center;">
-  <img src="./docs/images/dataset3_reconstructed.png" alt="Screenshot" width="620"/>
+  <img src="./docs/images/rotation_dataset_3.gif" width="620"/>
 </div>
 
 # Installation
