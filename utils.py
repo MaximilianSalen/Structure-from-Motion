@@ -8,7 +8,6 @@ import matplotlib.animation as animation
 from scipy.linalg import null_space
 from src import (
     pflat,
-    homogeneous_to_cartesian,
     triangulate_3D_point_DLT,
     filter_3D_points,
 )
@@ -76,7 +75,7 @@ def setup_logging(verbosity=None):
         logging.disable(logging.CRITICAL)
 
 
-def plot_3d_points_and_cameras_new(X, P, ax, color):
+def plot_3d_points_and_cameras(X, P, ax, color):
     """
     Plots the 3D points and cameras on the given axis.
     X: 4xN matrix of 3D points
@@ -104,78 +103,6 @@ def plot_3d_points_and_cameras_new(X, P, ax, color):
     ax.quiver(
         c[0, :], c[1, :], c[2, :], v[0, :], v[1, :], v[2, :], color="r", linewidth=1.5
     )
-
-
-def plot_3d_points_and_cameras(X, P):
-    """
-    Plots the 3D points and cameras.
-    X: 4xN matrix of 3D points
-    P: List of camera matrices
-    """
-    # Convert homogeneous coordinates to 3D coordinates
-    X_3d = pflat(X)
-
-    # Plotting the 3D points
-    fig = plt.figure(figsize=(10, 8))
-    ax = fig.add_subplot(111, projection="3d")
-    ax.scatter(X_3d[0, :], X_3d[1, :], X_3d[2, :], s=1)
-
-    # # Plotting the cameras
-    num_cams = len(P)
-    c = np.zeros((4, num_cams))
-    v = np.zeros((3, num_cams))
-
-    for i in range(num_cams):
-        ns = null_space(P[i])
-        if ns.size:  # Check if null space is not empty
-            c[:, i] = ns[:, 0]
-        v[:, i] = P[i][2, 0:3]
-
-    c = c / c[3, :]
-    ax.quiver(
-        c[0, :], c[1, :], c[2, :], v[0, :], v[1, :], v[2, :], color="r", linewidth=1.5
-    )
-
-    # Setting axis properties for a realistic view
-    ax.set_xlabel("X")
-    ax.set_ylabel("Y")
-    ax.set_zlabel("Z")
-    ax.set_title("3D Points and Camera Positions")
-    ax.axis("equal")
-
-    plt.show()
-
-
-def project_points(Ps, X, imgs, xs):
-    plt.figure(figsize=(20, 20))
-    for i in range(2):
-        projected_points = Ps[i] @ X
-        X_projected = homogeneous_to_cartesian(projected_points)
-
-        x = xs[i]
-        plt.subplot(1, 2, i + 1)  # Create a subplot with 1 row and 2 columns
-        plt.imshow(imgs[i])
-        plt.scatter(
-            X_projected[0, :],
-            X_projected[1, :],
-            s=14,
-            color="magenta",
-            label="Projected",
-        )
-        plt.scatter(
-            x[0, :],
-            x[1, :],
-            s=10,
-            marker="x",
-            color="blue",
-            label="SIFT",
-            linewidth=0.7,
-        )
-        plt.legend()
-        plt.title(f"Cube {i + 1}")
-        plt.xlim([0, imgs[i].shape[1]])
-        plt.ylim([imgs[i].shape[0], 0])
-    plt.show()
 
 
 def visualize_sfm_results_with_rotation(
@@ -235,7 +162,7 @@ def visualize_sfm_results_with_rotation(
         X_filtered = filter_3D_points(X_triangulated)
 
         # Plot the filtered 3D points and camera positions
-        plot_3d_points_and_cameras_new(X_filtered, [P1, P2], ax, colors[i_camera])
+        plot_3d_points_and_cameras(X_filtered, [P1, P2], ax, colors[i_camera])
 
     # Create a progress bar for the rotation
     pbar = tqdm(total=120, desc="Generating Frames", unit="frame")
