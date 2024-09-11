@@ -8,6 +8,8 @@ from scipy.linalg import null_space
 from src import (
     pflat,
     homogeneous_to_cartesian,
+    triangulate_3D_point_DLT,
+    filter_3D_points,
 )
 
 
@@ -143,21 +145,6 @@ def plot_3d_points_and_cameras(X, P):
     plt.show()
 
 
-def draw_points(image_name, points):
-    # Load the image
-    image = cv2.imread(image_name)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-    # Draw each point on the image
-    for point in points.T:
-        x, y = point[:2]  # Assuming each point is a tuple (x, y)
-        cv2.circle(image, (int(x), int(y)), 5, (0, 255, 0), -1)
-
-    # Display the image
-    plt.imshow(image)
-    plt.show()
-
-
 def project_points(Ps, X, imgs, xs):
     plt.figure(figsize=(20, 20))
     for i in range(2):
@@ -187,4 +174,53 @@ def project_points(Ps, X, imgs, xs):
         plt.title(f"Cube {i + 1}")
         plt.xlim([0, imgs[i].shape[1]])
         plt.ylim([imgs[i].shape[0], 0])
+    plt.show()
+
+
+def visualize_sfm_results(
+    K, absolute_rotations, refined_Ts, x_pairs, nr_images, colors
+):
+    """
+    Visualizes the 3D points and camera positions in a 3D plot.
+
+    Args:
+        K (np.ndarray): Camera intrinsic matrix.
+        absolute_rotations (list): List of absolute rotation matrices for each camera.
+        refined_Ts (list): List of refined translation vectors for each camera.
+        x_pairs (list): List of keypoint pairs between consecutive images.
+        nr_images (int): Number of images in the sequence.
+        colors (list): List of colors to use for the camera visualizations.
+    """
+    # Set up the 3D plot
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111, projection="3d")
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_zlabel("Z")
+    ax.set_title("3D Points and Camera Positions")
+    ax.axis("equal")
+
+    # Loop through the camera positions and visualize the points and cameras
+    for i_camera in range(nr_images - 1):
+        P1 = np.hstack(
+            (absolute_rotations[i_camera], refined_Ts[i_camera].reshape(3, 1))
+        )
+        P2 = np.hstack(
+            (absolute_rotations[i_camera + 1], refined_Ts[i_camera + 1].reshape(3, 1))
+        )
+
+        P1 = K @ P1
+        P2 = K @ P2
+
+        x1 = x_pairs[2 * i_camera]
+        x2 = x_pairs[2 * i_camera + 1]
+
+        # Triangulate 3D points and filter them
+        X_triangulated = triangulate_3D_point_DLT([P1, P2], [x1, x2])
+        X_filtered = filter_3D_points(X_triangulated)
+
+        # Plot the filtered 3D points and camera positions
+        plot_3d_points_and_cameras_new(X_filtered, [P1, P2], ax, colors[i_camera])
+
+    # Display the 3D plot
     plt.show()

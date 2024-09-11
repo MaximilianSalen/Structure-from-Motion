@@ -9,7 +9,7 @@
             "console": "integratedTerminal", // Runs in the VSCode terminal
             "args": [
                 "data", // Example argument: file path
-                "1", // Example argument: dataset name
+                "2", // Example argument: dataset name
                 "1.0", // Example argument: threshold
             ]
         }

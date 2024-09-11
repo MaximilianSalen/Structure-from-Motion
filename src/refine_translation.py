@@ -51,6 +51,7 @@ def refine_translation(
             mu=0.01,
         )
         refined_Ts.append(refined_T)
+    return refined_Ts
 
 
 def levenberg_marquardt_algorithm(

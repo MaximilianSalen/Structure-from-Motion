@@ -50,5 +50,19 @@ def visualize_results():
     args = parse_args()
 
     # Load the results from the file
-    with open(f"results/{args.dataset}/sfm_results.pkl", "rb") as f:
+    with open(f"results/dataset_{args.dataset}/sfm_results.pkl", "rb") as f:
         data = pickle.load(f)
+
+        # Extract necessary data
+    K = data["K"]
+    absolute_rotations = data["absolute_rotations"]
+    refined_Ts = data["refined_Ts"]
+    x_pairs = data["x_pairs"]
+    nr_images = data["nr_images"]
+
+    # Call the utility function to visualize the results
+    visualize_sfm_results(K, absolute_rotations, refined_Ts, x_pairs, nr_images, COLORS)
+
+
+if __name__ == "__main__":
+    visualize_results()
