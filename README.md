@@ -8,7 +8,7 @@ This project is a 3D reconstruction software that utilizes structure from motion
   <img src="./docs/images/rotation_dataset_3.gif" width="500"/>
 </div>
 
-# Installation
+## Installation
 Create a conda virtual environment and activate it using the following shell script:
 
 ```bash
@@ -20,7 +20,7 @@ If you prefer aren't using linux and want to directly get the dependencies:
 pip install -r requirements.txt
 ```
 
-# High-level Overview of Algorithm
+## Implementation
 
 1. First, we calculate the relative orientations between consecutive images using a parallel RANSAC method that combines the estimation of the essential matrix ($E$) and homography ($H$). For non-planar scenes, the essential matrix is calculated using the 7/8-point method to account for depth and camera motion. In planar scenes, the homography is used to describe the transformation between views, as it is more suited for flat surfaces.
 
@@ -62,4 +62,33 @@ reconstruction of 3D points. These reconstructed 3D points, generated from all t
 are then visualized along with the camera vectors, providing a comprehensive representation of the scene
 as captured from multiple perspectives.
 
-# Usage
+## SFM-Pipeline
+
+#### In order to run the SFM-pipeline, run the following command:
+
+```bash
+python3 run_sfm.py --data_path <path_to_dataset> --dataset <name_of_dataset> --threshold <threshold_value> --verbosity <verbosity_option>
+```
+
+#### Example:
+
+```bash
+python3 run_sfm.py --data_path data --dataset 5 --threshold 1.0 --verbosity INFO  
+```
+
+## Visualization
+
+#### To visualize the result of the SFM-pipeline, run:
+
+```bash
+python3 visualization.py --dataset <name_of_dataset>
+```
+
+The 3D-reconstruction animation is saved to "/output/rotation_dataset_<name_of_dataset>.gif"
+
+<div style="text-align: center;">
+  <img src="./docs/images/rotation_dataset_5.gif" width="400"/>
+</div>
+
+
+## Reconstruct your own scene!
