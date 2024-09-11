@@ -143,12 +143,10 @@ While the 3D reconstruction pipeline is designed to handle a wide range of image
 
 2. **Poor Image Quality**: Blurry, noisy, or low-resolution images can result in poor feature extraction, making it difficult for the algorithm to match keypoints and construct a 3D model. Ensure your images are sharp and clear for optimal results.
 
-3. **Moving Objects**: If there are moving objects in the scene, they will appear in different positions across the images, which can confuse the feature-matching process and lead to erroneous reconstructions. It is essential to ensure that the scene remains static while taking the images.
+3. **Planar Scenes**: The pipeline struggles with flat, planar scenes, where feature points lie on a single plane. In such cases, homography is often estimated instead of the essential matrix, and it becomes difficult to estimate depth or reconstruct the 3D structure accurately.
 
-4. **Incorrect Camera Calibration**: Errors in the camera parameters (focal length, principal point, etc.) specified in the `cfg.yml` file can cause the reconstruction to break, as the pipeline relies on accurate camera calibration for key operations like triangulation and projection.
+4. **Inconsistent Lighting**: Large changes in lighting or shadows between images can make it difficult to extract consistent features and cause keypoint mismatches. Aim for evenly lit scenes with minimal shadows.
 
-5. **Inconsistent Lighting**: Large changes in lighting or shadows between images can make it difficult to extract consistent features and cause keypoint mismatches. Aim for evenly lit scenes with minimal shadows.
-
-6. **Incorrect Initial Pair**: If the initial image pair chosen for reconstruction does not have sufficient overlap or is not representative of the entire scene, the pipeline might fail to build an initial 3D model. Make sure the `initial_pair` in the `cfg.yml` file corresponds to images that are well-suited for triangulation.
+5. **Incorrect Initial Pair**: If the initial image pair chosen for reconstruction does not have sufficient overlap or is not representative of the entire scene, the pipeline might fail to build an initial 3D model. Make sure the `initial_pair` in the `cfg.yml` file corresponds to images that are well-suited for triangulation.
 
 By ensuring that the dataset avoids these pitfalls, the reconstruction pipeline is more likely to succeed and produce high-quality 3D reconstructions.
