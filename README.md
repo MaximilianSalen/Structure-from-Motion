@@ -150,3 +150,39 @@ While the 3D reconstruction pipeline is designed to handle a wide range of image
 5. **Incorrect Initial Pair**: If the initial image pair chosen for reconstruction does not have sufficient overlap or is not representative of the entire scene, the pipeline might fail to build an initial 3D model. Make sure the `initial_pair` in the `cfg.yml` file corresponds to images that are well-suited for triangulation.
 
 By ensuring that the dataset avoids these pitfalls, the reconstruction pipeline is more likely to succeed and produce high-quality 3D reconstructions.
+
+
+### Tips for Creating a 3D Reconstruction Dataset Using an iPhone
+
+If you're using an iPhone (or any smartphone) to capture images for 3D reconstruction, here's a method you can follow:
+
+#### Step 1: Film the Scene
+1. **Use the Camera App**: Open the camera app and switch to video mode.
+2. **Move Slowly Around the Scene**: Walk slowly around the object or area you want to reconstruct, ensuring you capture it from various angles. Try to keep the distance between you and the object relatively consistent, and avoid making sudden movements.
+3. **Maintain Good Lighting**: Make sure the scene is well-lit, with minimal shadows. Indoor lighting or natural daylight works best.
+4. **Use Horizontal/Vertical Stabilization**: Try to keep the iPhone as steady as possible, either by holding it with both hands or using a tripod/gimbal for more professional results.
+
+#### Step 2: Extract Frames From the Video
+1. **Transfer the Video to Your Computer**: Once you have finished recording, transfer the video file to your computer.
+2. **Use a Frame Extraction Tool**: There are several tools that can extract frames from videos, such as `ffmpeg`, which is a free and powerful command-line tool.
+
+   You can use `ffmpeg` to extract one frame every second (or at a custom interval) like this:
+   ```bash
+   ffmpeg -i your_video.mp4 -vf "fps=1" frames/output_%03d.jpg
+
+#### Step 3: Collect Camera Intrinsics
+Use a tool like `ExifTool` to collect focal length and principal point.
+
+Example:
+
+```bash
+exiftool your_video.mp4
+```
+Output:
+```bash
+ExifTool Version Number         : 12.16
+File Name                       : your_video.mp4
+Focal Length                    : 4.25 mm
+Focal Length In 35mm Format      : 26 mm
+Image Size                      : 4032x3024
+```
