@@ -114,14 +114,8 @@ def visualize_sfm_results_with_rotation(
     Visualizes the 3D points and camera positions in a rotating 3D plot, and saves it as an animated GIF.
 
     Args:
-        K (np.ndarray): Camera intrinsic matrix.
-        absolute_rotations (list): List of absolute rotation matrices for each camera.
-        refined_Ts (list): List of refined translation vectors for each camera.
-        x_pairs (list): List of keypoint pairs between consecutive images.
-        nr_images (int): Number of images in the sequence.
+        sfm_data_dict (dict): Dictionary containing necessary information for visualization of the 3D construction.
         colors (list): List of colors to use for the camera visualizations.
-        save_path (str, optional): Path to save the animated plot. If None, the plot is displayed interactively.
-        tag (str, optional): Tag for the saved GIF filename.
     """
     K = sfm_data_dict["K"]
     absolute_rotations = sfm_data_dict["absolute_rotations"]
