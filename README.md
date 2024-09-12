@@ -9,6 +9,12 @@ This project is a 3D reconstruction software that utilizes structure from motion
 </div>
 
 ## Installation
+Start by cloning the repo:
+
+```bash
+git clone https://github.com/MaximilianSalen/Structure-from-Motion.git
+```
+
 Create a conda virtual environment and activate it using the following shell script:
 
 ```bash
